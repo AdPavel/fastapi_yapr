@@ -1,0 +1,6 @@
+ 
+!/src/.idea/
+!/.gitignore
+
+# Project exclude paths
+/venv/
