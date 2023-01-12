@@ -30,7 +30,7 @@ def main():
     logging.basicConfig(level=logging.INFO)
 
     els_index = 'movies'
-    els_schema_path = 'etl/els_schema.json'
+    els_schema_path = 'els_schema.json'
 
     redis_adapter = redis.Redis(
         host=redis_configs.redis_host, port=redis_configs.redis_port,
