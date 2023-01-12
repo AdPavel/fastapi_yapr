@@ -1,0 +1,53 @@
+version: '3.7'
+services:
+  db:
+    container_name: dev_db
+    image: postgres:13.9-alpine
+    restart: always
+    env_file: ./.env.db
+    volumes:
+      - ./db/pg_data:/var/lib/postgresql/data/
+      - ./db/restore/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+    expose:
+      - "5432"
+
+  redis:
+    image: redis:alpine
+
+  els:
+    container_name: elasticDB
+    image: elasticsearch:7.17.8
+    environment:
+      discovery.type: "single-node"
+      ES_JAVA_OPTS: "-Xms200m -Xmx200m"
+      xpack.security.enabled: "false"
+    volumes:
+      - ./db/es_data:/usr/share/elasticsearch/data
+    expose:
+      - "9200"
+    healthcheck:
+      test: curl -s curl http://localhost:9200/_cluster/health?pretty
+      interval: 30s
+      timeout: 10s
+      retries: 50
+
+  etl:
+    container_name: etl
+    build: ./etl
+    env_file: ./.env
+    entrypoint: /opt/app/run_etl.sh
+    depends_on:
+        - db
+        - els
+
+  kibana:
+    image: kibana:7.13.0
+    volumes:
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+    depends_on:
+      - els
+    ports:
+      - "5601:5601"
+
+volumes:
+  db:
