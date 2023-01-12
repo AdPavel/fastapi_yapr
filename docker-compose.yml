@@ -2,7 +2,7 @@ version: '3.7'
 services:
   db:
     container_name: dev_db
-    image: postgres:13.9-alpine
+    image: postgres:13.0-alpine
     restart: always
     env_file: ./.env.db
     volumes:
@@ -16,15 +16,15 @@ services:
 
   els:
     container_name: elasticDB
-    image: elasticsearch:7.17.8
+    image: elasticsearch:7.13.0
     environment:
       discovery.type: "single-node"
       ES_JAVA_OPTS: "-Xms200m -Xmx200m"
       xpack.security.enabled: "false"
     volumes:
       - ./db/es_data:/usr/share/elasticsearch/data
-    expose:
-      - "9200"
+    ports:
+      - "9200:9200"
     healthcheck:
       test: curl -s curl http://localhost:9200/_cluster/health?pretty
       interval: 30s
@@ -41,7 +41,7 @@ services:
         - els
 
   kibana:
-    image: kibana:7.13.0
+    image: docker.elastic.co/kibana/kibana:7.13.0
     volumes:
       - ./kibana.yml:/usr/share/kibana/config/kibana.yml
     depends_on:
