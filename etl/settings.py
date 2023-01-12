@@ -11,19 +11,19 @@ class PostgresSettings(BaseSettings):
     class Config:
         fields = {
             'dbname': {
-                'env': 'DB_NAME',
+                'env': 'POSTGRES_DB',
             },
             'user': {
-                'env': 'DB_USER',
+                'env': 'POSTGRES_USER',
             },
             'password': {
-                'env': 'DB_PASSWORD',
+                'env': 'POSTGRES_PASSWORD',
             },
             'host': {
-                'env': 'DB_HOST',
+                'env': 'POSTGRES_HOST',
             },
             'port': {
-                'env': 'DB_PORT',
+                'env': 'POSTGRES_PORT',
             },
         }
 
