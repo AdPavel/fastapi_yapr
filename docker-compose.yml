@@ -12,6 +12,7 @@ services:
       - "5432"
 
   redis:
+    container_name: redis
     image: redis:alpine
 
   els:
@@ -41,13 +42,25 @@ services:
         - els
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.13.0
+    container_name: kibana
+    image: kibana:7.13.0
     volumes:
       - ./kibana.yml:/usr/share/kibana/config/kibana.yml
     depends_on:
       - els
     ports:
       - "5601:5601"
+
+  fastapi:
+    container_name: fastapi
+    build: ./fastapi_srv
+    env_file: ./.env
+    ports:
+      - "8001:8001"
+    depends_on:
+      - redis
+      - els
+      - etl
 
 volumes:
   db:
