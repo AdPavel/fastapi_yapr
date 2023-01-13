@@ -56,3 +56,21 @@ class Movie(BaseModel):
         if value is None:
             return []
         return value
+
+
+class Genre(BaseModel):
+    id: UUID
+    name: str
+    description: Optional[str]
+
+    @validator('description')
+    def valid_description(cls, value):
+        if value is None:
+            return ''
+        return value
+
+
+transform_models = {
+    'movies': Movie,
+    'genres': Genre
+}

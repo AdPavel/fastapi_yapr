@@ -20,5 +20,6 @@ while true
 do
     echo "Starting load_data_els"
     python main.py movies
+    python main.py genres
     sleep 3600
 done
