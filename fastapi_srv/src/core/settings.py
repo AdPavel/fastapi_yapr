@@ -1,4 +1,5 @@
-from pydantic import BaseSettings, Field
+import pathlib
+from pydantic import BaseSettings
 
 
 class Base(BaseSettings):
@@ -17,10 +18,9 @@ class Base(BaseSettings):
     # redis_db: int
 
     class Config:
-        # case_sensitive = False
-        # env_prefix = ""
-        env_file = '.env'
+
+        env_file = f"{pathlib.Path(__file__).resolve().parent.parent.parent.parent}/.env"
         env_file_encoding = 'utf-8'
 
 
-settings = Base(_env_file='../.env', _env_file_encoding='utf-8')
+settings = Base()
