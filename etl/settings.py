@@ -1,7 +1,13 @@
+import pathlib
 from pydantic import BaseSettings
 
 
-class PostgresSettings(BaseSettings):
+class ConfigMix(BaseSettings):
+    class Config:
+        env_file = f"{pathlib.Path(__file__).resolve().parent.parent}/.env"
+
+
+class PostgresSettings(ConfigMix, BaseSettings):
     dbname: str
     user: str
     password: str
@@ -28,12 +34,12 @@ class PostgresSettings(BaseSettings):
         }
 
 
-class ELSSettings(BaseSettings):
+class ELSSettings(ConfigMix, BaseSettings):
     els_host: str
     els_port: int
 
 
-class RedisSettings(BaseSettings):
+class RedisSettings(ConfigMix, BaseSettings):
     redis_host: str
     redis_port: int
     redis_db: int

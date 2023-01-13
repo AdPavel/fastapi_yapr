@@ -1,26 +1,26 @@
-from pydantic import BaseSettings, Field
+import pathlib
+from pydantic import BaseSettings
 
 
 class Base(BaseSettings):
     # Project section
-    project_name: str = 'movies'
+    project_name: str
 
     # Elastic section
-    els_port: int = 9200
+    els_port: int
     # els_host: str = 'localhost'
-    els_host: str = 'els'
+    els_host: str
 
     # Redis section
-    redis_host: str = 'redis'
-    redis_port: int = 6379
+    redis_host: str
+    redis_port: int
     # redis_host: str = 'localhost'
     # redis_db: int
 
     class Config:
-        # case_sensitive = False
-        # env_prefix = ""
-        env_file = '.env'
+
+        env_file = f"{pathlib.Path(__file__).resolve().parent.parent.parent.parent}/.env"
         env_file_encoding = 'utf-8'
 
 
-settings = Base(_env_file='../.env', _env_file_encoding='utf-8')
+settings = Base()
