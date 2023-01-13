@@ -72,5 +72,6 @@ class Genre(BaseModel):
 
 transform_models = {
     'movies': Movie,
-    'genres': Genre
+    'genres': Genre,
+    'persons': PersonModel
 }
