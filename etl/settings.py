@@ -26,10 +26,10 @@ class PostgresSettings(ConfigMix, BaseSettings):
                 'env': 'POSTGRES_PASSWORD',
             },
             'host': {
-                'env': 'POSTGRES_HOST',
+                'env': 'DB_HOST',
             },
             'port': {
-                'env': 'POSTGRES_PORT',
+                'env': 'DB_PORT',
             },
         }
 
