@@ -22,3 +22,19 @@ modified_movies_query = """
     WHERE fw.modified > %s OR p.modified > %s OR g.modified > %s
     GROUP BY fw.id;
 """
+modified_genres_query = """
+    SELECT id, name, description, modified
+    FROM content.genre
+    WHERE modified > %s;
+"""
+
+sql_queries = {
+    'movies': {
+        'query': modified_movies_query,
+        'variables_amount': 3
+    },
+    'genres': {
+        'query': modified_genres_query,
+        'variables_amount': 1
+    }
+}
