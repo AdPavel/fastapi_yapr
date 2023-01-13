@@ -1,7 +1,7 @@
 modified_movies_query = """
     SELECT fw.id,
     fw.rating AS imdb_rating,
-    ARRAY_AGG(DISTINCT g.name) AS genre,
+    JSON_AGG(DISTINCT jsonb_build_object('id', g.id, 'name', g.name)) AS genre,
     fw.title,
     fw.description,
     ARRAY_AGG(DISTINCT p.full_name)
