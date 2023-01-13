@@ -21,5 +21,6 @@ do
     echo "Starting load_data_els"
     python main.py movies
     python main.py genres
+    python main.py persons
     sleep 3600
 done

@@ -27,6 +27,11 @@ modified_genres_query = """
     FROM content.genre
     WHERE modified > %s;
 """
+modified_persons_query = """
+    SELECT id, full_name AS name, modified
+    FROM content.person
+    WHERE modified > %s;
+"""
 
 sql_queries = {
     'movies': {
@@ -35,6 +40,10 @@ sql_queries = {
     },
     'genres': {
         'query': modified_genres_query,
+        'variables_amount': 1
+    },
+    'persons': {
+        'query': modified_persons_query,
         'variables_amount': 1
     }
 }

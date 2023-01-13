@@ -4,7 +4,7 @@ from pydantic.schema import Optional, List
 from pydantic import BaseModel, validator
 
 
-class PersonModel(BaseModel):
+class Person(BaseModel):
     id: str
     name: str
 
@@ -72,5 +72,6 @@ class Genre(BaseModel):
 
 transform_models = {
     'movies': Movie,
-    'genres': Genre
+    'genres': Genre,
+    'persons': Person
 }
