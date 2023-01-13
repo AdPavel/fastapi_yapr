@@ -9,9 +9,12 @@ class Genre(BaseModel):
     name: str
 
 
-class Person(BaseModel):
+class BasePerson(BaseModel):
     uuid: UUID
     full_name: str
+
+
+class Person(BasePerson):
     role: str
     film_ids: List[UUID]
 
@@ -22,6 +25,6 @@ class Film(BaseModel):
     imdb_rating: Optional[float] = 0
     description: Optional[str] = ''
     genre: Optional[List[Genre]] = []
-    actors: Optional[List[Person]] = []
-    writers: Optional[List[Person]] = []
-    directors: Optional[List[Person]] = []
+    actors: Optional[List[BasePerson]] = []
+    writers: Optional[List[BasePerson]] = []
+    directors: Optional[List[BasePerson]] = []
