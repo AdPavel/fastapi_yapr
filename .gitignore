@@ -1,0 +1,6 @@
+.env
+.env.db
+.idea/
+__pycache__/
+db/es_data/nodes/
+db/pg_data/

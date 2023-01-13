@@ -43,7 +43,7 @@ services:
 
   kibana:
     container_name: kibana
-    image: kibana:7.13.0
+    image: docker.elastic.co/kibana/kibana:7.13.0
     volumes:
       - ./kibana.yml:/usr/share/kibana/config/kibana.yml
     depends_on:
