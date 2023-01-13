@@ -1,15 +1,14 @@
-from pydantic import BaseModel
 from typing import Optional, List
 from .config_mixin import ConfigMixin
 
 
-class Film(BaseModel, ConfigMixin):
+class Film(ConfigMixin):
     id: str
     title: str
     description: Optional[str] = ''
     genre: Optional[List[str]] = []
     imdb_rating: Optional[float] = 0
-    director: Optional[str] = ''
+    directors: Optional[List[dict]] = []
     writers: Optional[List[dict]] = []
     actors: Optional[List[dict]] = []
     directors_names: Optional[List[str]] = []
