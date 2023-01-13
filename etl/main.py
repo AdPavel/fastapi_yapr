@@ -22,15 +22,16 @@ from transformer import DataTransformer
 def main():
 
     parser = argparse.ArgumentParser(description='Load data from postgres to elasticsearch')
+    parser.add_argument('index_name', type=str, help='Define an index to load')
     parser.add_argument('-md', '--modified_date', type=str, help='Define a modified date')
     args = parser.parse_args()
 
     modified_date = args.modified_date
+    els_index = args.index_name
 
     logging.basicConfig(level=logging.INFO)
 
-    els_index = 'movies'
-    els_schema_path = 'els_schema.json'
+    els_schema_path = 'els_schemas/{els_index}.json'.format(els_index=els_index)
 
     redis_adapter = redis.Redis(
         host=redis_configs.redis_host, port=redis_configs.redis_port,

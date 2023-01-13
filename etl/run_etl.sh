@@ -19,6 +19,6 @@ echo "PostgreSQL started"
 while true
 do
     echo "Starting load_data_els"
-    python main.py
+    python main.py movies
     sleep 3600
 done
