@@ -5,7 +5,7 @@ from pydantic import BaseModel, validator
 
 
 class Person(BaseModel):
-    id: str
+    id: UUID
     name: str
 
 
