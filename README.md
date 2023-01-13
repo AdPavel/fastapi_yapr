@@ -5,9 +5,17 @@
 ```
 docker-compose up -d --build
 ```
+или, если у вас MacOS
+```
+docker-compose -f docker-compose.mac.yml up -d --build
+```
 Чтобы остановить контейнер и удалить volumes выполните команду
 ```
 docker-compose down -v
+```
+или
+```
+docker-compose -f docker-compose.mac.yml down
 ```
 Сервис доступен по адресу http://0.0.0.0:8001/
 
