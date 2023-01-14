@@ -1,3 +1,4 @@
+from enum import Enum
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -23,6 +24,11 @@ async def film_details(film_id: str, film_service: FilmService = Depends(get_fil
     return Film(**film.dict())
 
 
+class Sort(str, Enum):
+    imdb_rating_desc = '-imdb_rating'
+    imdb_rating_asc = 'imdb_rating'
+
+
 @router.get(
     '/',
     response_model=list[BaseFilm],
@@ -31,13 +37,14 @@ async def film_details(film_id: str, film_service: FilmService = Depends(get_fil
     response_description="Фильмы"
 )
 async def get_films(
-        sort: str = Query(default='-imdb_rating', title='Сортировка'),
+        genre: str = Query(default=None, title='Жанр'),
+        sort: Sort = Query(default=Sort.imdb_rating_desc, title='Сортировка'),
         page: int = Query(default=1, ge=1, title='Страница'),
         size: int = Query(default=50, ge=1, title='Количество фильмов на странице'),
         film_service: FilmService = Depends(get_film_service)
 ) -> list[Film]:
 
-    films = await film_service.get_films_from_elastic(page, size, sort)
+    films = await film_service.get_films_from_elastic(page, size, sort.value, genre)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
 

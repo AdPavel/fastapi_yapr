@@ -2,11 +2,10 @@ from functools import lru_cache
 from typing import Optional
 
 from aioredis import Redis
-from elasticsearch import AsyncElasticsearch, NotFoundError
-from fastapi import Depends
-
 from db.elastic import get_elastic
 from db.redis import get_redis
+from elasticsearch import AsyncElasticsearch, NotFoundError
+from fastapi import Depends
 from models.film import Film
 
 FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5  # 5 минут
@@ -40,10 +39,24 @@ class FilmService:
         return Film(**doc['_source'])
 
     async def get_films_from_elastic(
-            self, page: int, size: int, sort_: str
+            self, page: int, size: int, sort_: str, genre_id: str
     ) -> Optional[list[Film]]:
 
-        body = {"query": {"match_all": {}}}
+        if genre_id:
+            body = {
+                "query": {
+                    "nested": {
+                        "path": "genre",
+                        "query": {
+                            "match": {
+                                "genre.id": genre_id
+                            }
+                        }
+                    }
+                }
+            }
+        else:
+            body = {"query": {"match_all": {}}}
         from_ = (page - 1) * size
         sort = f'{sort_[1:]}:desc' if sort_.startswith('-') else f'{sort_}:asc'
 
