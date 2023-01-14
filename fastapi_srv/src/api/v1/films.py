@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from services.film import FilmService, get_film_service
 
 from .response_models import Film, BaseFilm
+from uuid import UUID
 
 router = APIRouter()
 
@@ -16,7 +17,7 @@ router = APIRouter()
     description="Детализированная информация по фильму",
     response_description="Детализированная информация по фильму"
 )
-async def film_details(film_id: str, film_service: FilmService = Depends(get_film_service)) -> Film:
+async def film_details(film_id: UUID, film_service: FilmService = Depends(get_film_service)) -> Film:
     film = await film_service.get_by_id(film_id)
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
@@ -37,7 +38,7 @@ class Sort(str, Enum):
     response_description="Фильмы"
 )
 async def get_films(
-        genre: str = Query(default=None, title='Жанр'),
+        genre: UUID = Query(default=None, title='Жанр'),
         sort: Sort = Query(default=Sort.imdb_rating_desc, title='Сортировка'),
         page: int = Query(default=1, ge=1, title='Страница'),
         size: int = Query(default=50, ge=1, title='Количество фильмов на странице'),
