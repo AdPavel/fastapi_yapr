@@ -39,11 +39,18 @@ class FilmService:
             return None
         return Film(**doc['_source'])
 
-    async def get_films_from_elastic(self, page: int, size: int) -> Optional[list[Film]]:
+    async def get_films_from_elastic(
+            self, page: int, size: int, sort_: str
+    ) -> Optional[list[Film]]:
+
+        body = {"query": {"match_all": {}}}
+        from_ = (page - 1) * size
+        sort = f'{sort_[1:]}:desc' if sort_.startswith('-') else f'{sort_}:asc'
+
         try:
-            body = {"query": {"match_all": {}}}
-            from_ = (page - 1) * size
-            result = await self.elastic.search(index='movies', body=body, size=size, from_=from_)
+            result = await self.elastic.search(
+                index='movies', body=body, size=size, from_=from_, sort=sort
+            )
             docs = result['hits']['hits']
         except NotFoundError:
             return None

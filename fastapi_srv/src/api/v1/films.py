@@ -31,12 +31,13 @@ async def film_details(film_id: str, film_service: FilmService = Depends(get_fil
     response_description="Фильмы"
 )
 async def get_films(
+        sort: str = Query(default='-imdb_rating', title='Сортировка'),
         page: int = Query(default=1, ge=1, title='Страница'),
         size: int = Query(default=50, ge=1, title='Количество фильмов на странице'),
         film_service: FilmService = Depends(get_film_service)
 ) -> list[Film]:
 
-    films = await film_service.get_films_from_elastic(page, size)
+    films = await film_service.get_films_from_elastic(page, size, sort)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
 
