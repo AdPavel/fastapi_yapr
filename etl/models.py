@@ -7,6 +7,20 @@ from pydantic import BaseModel, validator
 class Person(BaseModel):
     id: UUID
     name: str
+    role: Optional[List]
+    film_ids: Optional[List]
+
+    @validator('role')
+    def valid_role(cls, value):
+        if value is None:
+            return []
+        return value
+
+    @validator('film_ids')
+    def valid_film_ids(cls, value):
+        if value is None:
+            return []
+        return value
 
 
 class Movie(BaseModel):

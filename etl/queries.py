@@ -30,10 +30,16 @@ modified_genres_query = """
     WHERE modified > %s;
 """
 modified_persons_query = """
-    SELECT id, full_name AS name, modified
-    FROM content.person
-    WHERE modified > %s;
+    SELECT p.id,
+    p.full_name as name,
+    ARRAY_AGG(DISTINCT pfw.role) AS role,
+    ARRAY_AGG(DISTINCT pfw.film_work_id) AS film_ids
+    FROM content.person p
+    LEFT OUTER JOIN content.person_film_work pfw ON (p.id = pfw.person_id)
+    WHERE p.modified > %s OR pfw.created > %s
+    GROUP BY p.id;
 """
+
 
 sql_queries = {
     'movies': {
@@ -46,6 +52,6 @@ sql_queries = {
     },
     'persons': {
         'query': modified_persons_query,
-        'variables_amount': 1
+        'variables_amount': 2
     }
 }
