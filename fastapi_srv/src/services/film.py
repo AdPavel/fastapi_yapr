@@ -39,6 +39,16 @@ class FilmService:
             return None
         return Film(**doc['_source'])
 
+    async def get_films_from_elastic(self, page: int, size: int) -> Optional[list[Film]]:
+        try:
+            body = {"query": {"match_all": {}}}
+            from_ = (page - 1) * size
+            result = await self.elastic.search(index='movies', body=body, size=size, from_=from_)
+            docs = result['hits']['hits']
+        except NotFoundError:
+            return None
+        return [Film(**doc['_source']) for doc in docs]
+
     async def _film_from_cache(self, film_id: str) -> Optional[Film]:
         # Пытаемся получить данные о фильме из кеша, используя команду get
         # https://redis.io/commands/get

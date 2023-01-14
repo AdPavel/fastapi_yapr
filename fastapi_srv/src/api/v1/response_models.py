@@ -19,10 +19,13 @@ class Person(BasePerson):
     film_ids: List[UUID]
 
 
-class Film(BaseModel):
+class BaseFilm(BaseModel):
     uuid: UUID
     title: str
     imdb_rating: Optional[float] = 0
+
+
+class Film(BaseFilm):
     description: Optional[str] = ''
     genre: Optional[List[Genre]] = []
     actors: Optional[List[BasePerson]] = []
