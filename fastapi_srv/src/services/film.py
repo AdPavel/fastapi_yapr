@@ -40,12 +40,12 @@ class FilmService:
 
         if genre_id:
             body = {
-                "query": {
-                    "nested": {
-                        "path": "genre",
-                        "query": {
-                            "match": {
-                                "genre.id": genre_id
+                'query': {
+                    'nested': {
+                        'path': 'genre',
+                        'query': {
+                            'match': {
+                                'genre.id': genre_id
                             }
                         }
                     }
@@ -53,15 +53,15 @@ class FilmService:
             }
         elif query:
             body = {
-                "query": {
-                    "multi_match": {
-                        "query": query,
-                        "fields": ["title", "description"],
+                'query': {
+                    'multi_match': {
+                        'query': query,
+                        'fields': ['title', 'description'],
                     }
                 }
             }
         else:
-            body = {"query": {"match_all": {}}}
+            body = {'query': {'match_all': {}}}
 
         from_ = (page - 1) * size
         sort = (f'{sort_[1:]}:desc' if sort_.startswith('-') else f'{sort_}:asc') if sort_ else None
