@@ -35,7 +35,7 @@ class FilmService:
         return Film(**doc['_source'])
 
     async def get_films_from_elastic(
-            self, page: int, size: int, sort_: str, genre_id: UUID
+            self, page: int, size: int, genre_id: UUID = None, sort_: str = None, query: str = None
     ) -> Optional[list[Film]]:
 
         if genre_id:
@@ -51,17 +51,27 @@ class FilmService:
                     }
                 }
             }
+        elif query:
+            body = {
+                "query": {
+                    "multi_match": {
+                        "query": query,
+                        "fields": ["title", "description"],
+                    }
+                }
+            }
         else:
             body = {"query": {"match_all": {}}}
 
         from_ = (page - 1) * size
-        sort = f'{sort_[1:]}:desc' if sort_.startswith('-') else f'{sort_}:asc'
+        sort = (f'{sort_[1:]}:desc' if sort_.startswith('-') else f'{sort_}:asc') if sort_ else None
 
         try:
             result = await self.elastic.search(
                 index='movies', body=body, size=size, from_=from_, sort=sort
             )
             docs = result['hits']['hits']
+            print(docs)
         except NotFoundError:
             return None
         return [Film(**doc['_source']) for doc in docs]

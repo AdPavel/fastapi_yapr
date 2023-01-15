@@ -11,6 +11,26 @@ router = APIRouter()
 
 
 @router.get(
+    '/search',
+    response_model=list[BaseFilm],
+    summary="Поиск фильма",
+    description="Поиск фильма",
+    response_description="Найденные фильмы"
+)
+async def search_films(
+        query: str = Query(default=..., title='Что искать'),
+        page: int = Query(default=1, ge=1, title='Страница'),
+        size: int = Query(default=50, ge=1, title='Количество фильмов на странице'),
+        film_service: FilmService = Depends(get_film_service)
+) -> list[BaseFilm]:
+    films = await film_service.get_films_from_elastic(page=page, size=size, query=query)
+    if not films:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
+
+    return [BaseFilm(**film.dict()) for film in films]
+
+
+@router.get(
     '/{film_id}',
     response_model=Film,
     summary="Детализация по фильму",
@@ -45,7 +65,7 @@ async def get_films(
         film_service: FilmService = Depends(get_film_service)
 ) -> list[Film]:
 
-    films = await film_service.get_films_from_elastic(page, size, sort.value, genre)
+    films = await film_service.get_films_from_elastic(page=page, size=size, genre=genre, sort_=sort.value)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
 
