@@ -60,7 +60,7 @@ async def get_films(
         film_service: FilmService = Depends(get_film_service)
 ) -> list[Film]:
 
-    films = await film_service.get_films_from_elastic(page=page, size=size, genre=genre, sort_=sort.value)
+    films = await film_service.get_films_from_elastic(page=page, size=size, genre_id=genre, sort_=sort.value)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
 
