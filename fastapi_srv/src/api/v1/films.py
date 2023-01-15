@@ -1,11 +1,11 @@
-from enum import Enum
 from http import HTTPStatus
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from services.film import FilmService, get_film_service
 
-from .response_models import Film, BaseFilm
-from uuid import UUID
+from api.v1.models.query_models import Sort
+from api.v1.models.response_models import Film, BaseFilm
 
 router = APIRouter()
 
@@ -43,11 +43,6 @@ async def film_details(film_id: UUID, film_service: FilmService = Depends(get_fi
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
 
     return Film(**film.dict())
-
-
-class Sort(str, Enum):
-    imdb_rating_desc = '-imdb_rating'
-    imdb_rating_asc = 'imdb_rating'
 
 
 @router.get(
