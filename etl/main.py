@@ -51,6 +51,7 @@ def main():
     )
 
     with psycopg2.connect(**postgres_configs.dict(), cursor_factory=RealDictCursor) as pg_conn:
+        psycopg2.extras.register_uuid()
         postgres_extractor = PostgresExtractor(pg_conn, 100)
         logging.info('Create connection with Postgres')
         data_batches = postgres_extractor.get_modified_objects(modified_date, sql_queries[els_index])

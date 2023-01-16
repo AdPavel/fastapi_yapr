@@ -1,7 +1,10 @@
-from pydantic import BaseModel
+from uuid import UUID
+
+from pydantic import Field
+
 from .config_mixin import ConfigMixin
 
 
-class Person(BaseModel, ConfigMixin):
-    id: str
-    name: str
+class Person(ConfigMixin):
+    uuid: UUID = Field(alias='id')
+    full_name: str = Field(alias='name')
