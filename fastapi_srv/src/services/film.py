@@ -71,7 +71,7 @@ class FilmService:
                 index='movies', body=body, size=size, from_=from_, sort=sort
             )
             docs = result['hits']['hits']
-            print(docs)
+            # print(docs)
         except NotFoundError:
             return None
         return [Film(**doc['_source']) for doc in docs]

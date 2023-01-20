@@ -8,14 +8,11 @@ class Base(BaseSettings):
 
     # Elastic section
     els_port: int
-    # els_host: str = 'localhost'
     els_host: str
 
     # Redis section
     redis_host: str
     redis_port: int
-    # redis_host: str = 'localhost'
-    # redis_db: int
 
     class Config:
 
