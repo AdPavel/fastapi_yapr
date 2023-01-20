@@ -5,3 +5,5 @@ __pycache__/
 db/es_data/nodes/
 db/pg_data/
 .venv/
+/.env.db.dev
+/.env.dev

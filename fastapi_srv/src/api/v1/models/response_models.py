@@ -7,6 +7,7 @@ from pydantic import BaseModel
 class Genre(BaseModel):
     uuid: UUID
     name: str
+    description: Optional[str] = ''
 
 
 class BasePerson(BaseModel):
@@ -15,7 +16,7 @@ class BasePerson(BaseModel):
 
 
 class Person(BasePerson):
-    role: str
+    role: List[str]
     film_ids: List[UUID]
 
 

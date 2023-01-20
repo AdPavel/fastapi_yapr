@@ -1,14 +1,13 @@
 from typing import Optional, List
 from uuid import UUID
-
 from pydantic import Field
 
-from .config_mixin import ConfigMixin
+from .config_models import BaseConfig
 from .genre import Genre
 from .person import Person
 
 
-class Film(ConfigMixin):
+class Film(BaseConfig):
     uuid: UUID = Field(alias='id')
     title: str
     description: Optional[str] = ''
