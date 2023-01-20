@@ -17,7 +17,9 @@ docker-compose down -v
 ```
 docker-compose -f docker-compose.mac.yml down
 ```
-Сервис доступен по адресу http://0.0.0.0:8001/
+Сервис доступен по адресу: 
+- swagger: http://localhost/api/openapi
+- kibana: http://localhost
 
 **Требования к проекту:**
 
