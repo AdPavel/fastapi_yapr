@@ -8,58 +8,22 @@ from db.redis import get_redis
 from elasticsearch import AsyncElasticsearch, NotFoundError
 from fastapi import Depends
 from models.film import Film
+from services.common import Service
 
 FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5  # 5 минут
 
 
-class FilmService:
+class FilmService(Service):
     def __init__(self, redis: Redis, elastic: AsyncElasticsearch):
+        super().__init__(redis, elastic)
         self.redis = redis
         self.elastic = elastic
 
-    async def get_by_id(self, film_id: UUID) -> Optional[Film]:
-        film = await self._film_from_cache(str(film_id))
-        if not film:
-            film = await self._get_film_from_elastic(film_id)
-            if not film:
-                return None
-            await self._put_film_to_cache(film)
-
-        return film
-
-    async def _get_film_from_elastic(self, film_id: UUID) -> Optional[Film]:
-        try:
-            doc = await self.elastic.get('movies', film_id)
-        except NotFoundError:
-            return None
-        return Film(**doc['_source'])
-
-    async def get_films_from_elastic(
-            self, page: int, size: int, genre_id: UUID = None, sort_: str = None, query: str = None
-    ) -> Optional[list[Film]]:
+    async def get_films_genre_sort(
+            self, page: int, size: int, genre_id: UUID = None, sort_: str = None) -> Optional[list[Film]]:
 
         if genre_id:
-            body = {
-                'query': {
-                    'nested': {
-                        'path': 'genre',
-                        'query': {
-                            'match': {
-                                'genre.id': genre_id
-                            }
-                        }
-                    }
-                }
-            }
-        elif query:
-            body = {
-                'query': {
-                    'multi_match': {
-                        'query': query,
-                        'fields': ['title', 'description'],
-                    }
-                }
-            }
+            body = {'query': {'nested': {'path': 'genre', 'query': {'match': {'genre.id': genre_id}}}}}
         else:
             body = {'query': {'match_all': {}}}
 
@@ -71,21 +35,9 @@ class FilmService:
                 index='movies', body=body, size=size, from_=from_, sort=sort
             )
             docs = result['hits']['hits']
-            # print(docs)
         except NotFoundError:
             return None
         return [Film(**doc['_source']) for doc in docs]
-
-    async def _film_from_cache(self, film_id: str) -> Optional[Film]:
-        data = await self.redis.get(film_id)
-        if not data:
-            return None
-
-        film = Film.parse_raw(data)
-        return film
-
-    async def _put_film_to_cache(self, film: Film):
-        await self.redis.set(str(film.uuid), film.json(), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
 
 
 @lru_cache()

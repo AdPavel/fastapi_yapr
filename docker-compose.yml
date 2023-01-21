@@ -60,7 +60,7 @@ services:
     depends_on:
       - redis
       - els
-#      - etl
+      - etl
 
   nginx:
     container_name: dev_web
