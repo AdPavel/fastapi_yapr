@@ -24,8 +24,8 @@ services:
       xpack.security.enabled: "false"
     volumes:
       - ./db/es_data:/usr/share/elasticsearch/data
-    ports:
-      - "9200:9200"
+    expose:
+      - "9200"
     healthcheck:
       test: curl -s curl http://localhost:9200/_cluster/health?pretty
       interval: 30s
@@ -48,19 +48,31 @@ services:
       - ./kibana.yml:/usr/share/kibana/config/kibana.yml
     depends_on:
       - els
-    ports:
-      - "5601:5601"
+    expose:
+      - "5601"
 
   fastapi:
     container_name: fastapi
     build: ./fastapi_srv
     env_file: ./.env
-    ports:
-      - "8001:8001"
+    expose:
+      - "8001"
     depends_on:
       - redis
       - els
       - etl
+
+  nginx:
+    container_name: dev_web
+    restart: on-failure
+    image: nginx:latest
+    volumes:
+      - ./nginx_conf/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx_conf/configs:/etc/nginx/conf.d:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - fastapi
 
 volumes:
   db:
