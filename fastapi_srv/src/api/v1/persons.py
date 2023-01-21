@@ -2,6 +2,7 @@ from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from uuid import UUID
+from fastapi_cache.decorator import cache
 
 from services.person import PersonService, get_service
 from api.v1.models.response_models import Person, Film, BaseFilm
@@ -16,6 +17,7 @@ router = APIRouter()
     description="Поиск персоны",
     response_description="Найденные персоны"
 )
+@cache()
 async def search_person(
         query: str = Query(default=..., title='Что искать'),
         page: int = Query(default=1, ge=1, alias='page[number]', title='Страница'),
@@ -30,12 +32,14 @@ async def search_person(
     return [Person(**person.dict()) for person in persons]
 
 
-@router.get('/',
-            response_model=list[Person],
-            summary="Список персон",
-            description="Список персон",
-            response_description="Список персон"
-            )
+@router.get(
+    '/',
+    response_model=list[Person],
+    summary="Список персон",
+    description="Список персон",
+    response_description="Список персон"
+)
+@cache()
 async def persons_list(
         page: int = Query(default=1, ge=1, alias='page[number]', title='Страница'),
         size: int = Query(default=50, ge=1, alias='page[size]', title='Количество персон на странице'),
@@ -49,12 +53,14 @@ async def persons_list(
     return [Person(**person.dict()) for person in persons]
 
 
-@router.get('/{person_id}/film',
-            response_model=list[BaseFilm],
-            summary="Фильмы по персоне",
-            description="Фильмы по персоне",
-            response_description="Фильмы по персоне"
-            )
+@router.get(
+    '/{person_id}/film',
+    response_model=list[BaseFilm],
+    summary="Фильмы по персоне",
+    description="Фильмы по персоне",
+    response_description="Фильмы по персоне"
+)
+@cache()
 async def persons_films(
         person_id: UUID,
         person_service: PersonService = Depends(get_service)
@@ -65,12 +71,14 @@ async def persons_films(
     return [BaseFilm(**film.dict()) for film in films]
 
 
-@router.get('/{person_id}',
-            response_model=Person,
-            summary="Детализация по персоне",
-            description="Подробнее по персоне",
-            response_description="Подробнее по персоне"
-            )
+@router.get(
+    '/{person_id}',
+    response_model=Person,
+    summary="Детализация по персоне",
+    description="Подробнее по персоне",
+    response_description="Подробнее по персоне"
+)
+@cache()
 async def persons_detail(
         person_id: UUID,
         person_service: PersonService = Depends(get_service)

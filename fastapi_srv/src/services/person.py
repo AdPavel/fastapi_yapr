@@ -2,9 +2,7 @@ from functools import lru_cache
 from typing import Optional
 from uuid import UUID
 
-from aioredis import Redis
 from db.elastic import get_elastic
-from db.redis import get_redis
 from elasticsearch import AsyncElasticsearch, NotFoundError
 from fastapi import Depends
 from models.film import Film
@@ -29,7 +27,6 @@ class PersonService(Service):
 
 @lru_cache()
 def get_service(
-        redis: Redis = Depends(get_redis),
-        elastic: AsyncElasticsearch = Depends(get_elastic),
+    elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> PersonService:
-    return PersonService(redis, elastic)
+    return PersonService(elastic)
