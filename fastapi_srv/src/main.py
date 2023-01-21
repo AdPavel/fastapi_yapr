@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-from redis import asyncio as aioredis
+from redis import asyncio
 
 from api.v1 import films, genres, persons
 from core import config
@@ -23,7 +23,7 @@ app = FastAPI(
 
 @app.on_event('startup')
 async def startup():
-    redis.redis = aioredis.from_url(
+    redis.redis = asyncio.from_url(
         f'redis://{config.REDIS_HOST}:{config.REDIS_PORT}',
         encoding='utf8',
         decode_responses=True
@@ -34,8 +34,7 @@ async def startup():
 
 @app.on_event('shutdown')
 async def shutdown():
-    redis.redis.close()
-    await redis.redis.wait_closed()
+    await redis.redis.close()
     await elastic.es.close()
 
 
