@@ -83,4 +83,3 @@ def get_service(
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> Service:
     return Service(redis, elastic)
-

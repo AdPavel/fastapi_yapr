@@ -14,10 +14,6 @@ FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5  # 5 минут
 
 
 class FilmService(Service):
-    def __init__(self, redis: Redis, elastic: AsyncElasticsearch):
-        super().__init__(redis, elastic)
-        self.redis = redis
-        self.elastic = elastic
 
     async def get_films_genre_sort(
             self, page: int, size: int, genre_id: UUID = None, sort_: str = None) -> Optional[list[Film]]:
@@ -41,7 +37,7 @@ class FilmService(Service):
 
 
 @lru_cache()
-def get_film_service(
+def get_service(
         redis: Redis = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> FilmService:

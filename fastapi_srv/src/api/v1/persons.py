@@ -3,8 +3,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException, Query
 from uuid import UUID
 
-from services.common import Service, get_service
-from services.person import PersonService, get_person_service
+from services.person import PersonService, get_service
 from api.v1.models.response_models import Person, Film, BaseFilm
 
 router = APIRouter()
@@ -21,7 +20,7 @@ async def search_person(
         query: str = Query(default=..., title='Что искать'),
         page: int = Query(default=1, ge=1, alias='page[number]', title='Страница'),
         size: int = Query(default=50, ge=1, alias='page[size]', title='Количество персон на странице'),
-        person_service: Service = Depends(get_service)
+        person_service: PersonService = Depends(get_service)
 ) -> list[Person]:
     persons = await person_service.get_all_from_elastic(page=page, size=size, key='persons',
                                                         query=query, fields=['name'])
@@ -40,7 +39,7 @@ async def search_person(
 async def persons_list(
         page: int = Query(default=1, ge=1, alias='page[number]', title='Страница'),
         size: int = Query(default=50, ge=1, alias='page[size]', title='Количество персон на странице'),
-        person_service: Service = Depends(get_service)
+        person_service: PersonService = Depends(get_service)
 ) -> list[Person]:
 
     persons = await person_service.get_all_from_elastic(page=page, size=size, key='persons')
@@ -56,7 +55,10 @@ async def persons_list(
             description="Фильмы по персоне",
             response_description="Фильмы по персоне"
             )
-async def persons_films(person_id: UUID, person_service: PersonService = Depends(get_person_service)) -> list[BaseFilm]:
+async def persons_films(
+        person_id: UUID,
+        person_service: PersonService = Depends(get_service)
+) -> list[BaseFilm]:
     films = await person_service.get_persons_film(person_id)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')
@@ -69,7 +71,10 @@ async def persons_films(person_id: UUID, person_service: PersonService = Depends
             description="Подробнее по персоне",
             response_description="Подробнее по персоне"
             )
-async def persons_detail(person_id: UUID, person_service: Service = Depends(get_service)) -> Person:
+async def persons_detail(
+        person_id: UUID,
+        person_service: PersonService = Depends(get_service)
+) -> Person:
     person = await person_service.get_by_id(person_id, key='persons')
     if not person:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')
