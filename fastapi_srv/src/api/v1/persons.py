@@ -4,8 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from uuid import UUID
 from fastapi_cache.decorator import cache
 
-from src.services.person import PersonService, get_service
-from src.api.v1.models.response_models import Person, Film, BaseFilm
+from services.person import PersonService, get_service
+from api.v1.models.response_models import Person, BaseFilm
+from api.v1.message import PERSON_MSG
 
 router = APIRouter()
 
@@ -27,7 +28,7 @@ async def search_person(
     persons = await person_service.get_all_from_elastic(page=page, size=size, key='persons',
                                                         query=query, fields=['name'])
     if not persons:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='persons not found')
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=PERSON_MSG)
 
     return [Person(**person.dict()) for person in persons]
 
@@ -48,7 +49,7 @@ async def persons_list(
 
     persons = await person_service.get_all_from_elastic(page=page, size=size, key='persons')
     if not persons:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='persons not found')
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=PERSON_MSG)
 
     return [Person(**person.dict()) for person in persons]
 
@@ -67,7 +68,7 @@ async def persons_films(
 ) -> list[BaseFilm]:
     films = await person_service.get_persons_film(person_id)
     if not films:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=PERSON_MSG)
     return [BaseFilm(**film.dict()) for film in films]
 
 
@@ -85,5 +86,5 @@ async def persons_detail(
 ) -> Person:
     person = await person_service.get_by_id(person_id, key='persons')
     if not person:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=PERSON_MSG)
     return Person(**person.dict())
