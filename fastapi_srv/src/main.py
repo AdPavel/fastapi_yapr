@@ -1,3 +1,5 @@
+from logging import config as logging_config
+
 import uvicorn
 from elasticsearch import AsyncElasticsearch
 from fastapi import FastAPI
@@ -7,12 +9,15 @@ from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio
 
 from api.v1 import films, genres, persons
-from core import config
+from core.logger import LOGGING
+from core.settings import settings
 from db import elastic, redis
 
 
+logging_config.dictConfig(LOGGING)
+
 app = FastAPI(
-    title=f"Read-only API для онлайн-кинотеатра: {config.PROJECT_NAME}",
+    title=f"Read-only API для онлайн-кинотеатра: {settings.project_name}",
     description="Информация о фильмах, жанрах и людях, участвовавших в создании произведения",
     version="1.0.0",
     docs_url='/api/openapi',
@@ -24,11 +29,11 @@ app = FastAPI(
 @app.on_event('startup')
 async def startup():
     redis.redis = asyncio.from_url(
-        f'redis://{config.REDIS_HOST}:{config.REDIS_PORT}',
+        f'redis://{settings.redis_host}:{settings.redis_port}',
         encoding='utf8',
         decode_responses=True
     )
-    elastic.es = AsyncElasticsearch(hosts=[f'{config.ELASTIC_HOST}:{config.ELASTIC_PORT}'])
+    elastic.es = AsyncElasticsearch(hosts=[f'{settings.els_host}:{settings.els_port}'])
     FastAPICache.init(RedisBackend(redis.redis), prefix="fastapi-cache", expire=60 * 5)
 
 
