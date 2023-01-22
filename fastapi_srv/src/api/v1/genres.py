@@ -1,10 +1,11 @@
 from http import HTTPStatus
 from uuid import UUID
 
-from src.api.v1.models.response_models import Genre
+from api.v1.models.response_models import Genre
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_cache.decorator import cache
-from src.services.common import Service, get_service
+from services.common import Service, get_service
+from api.v1.message import GENRES_MSG
 
 router = APIRouter()
 
@@ -25,7 +26,7 @@ async def genres_list(
 
     genres = await genre_service.get_all_from_elastic(page=page, size=size, key='genres')
     if not genres:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='genres not found')
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=GENRES_MSG)
 
     return [Genre(**genre.dict()) for genre in genres]
 
@@ -41,5 +42,5 @@ async def genres_list(
 async def genres_detail(genre_id: UUID, genre_service: Service = Depends(get_service)) -> Genre:
     genre = await genre_service.get_by_id(genre_id, key='genres')
     if not genre:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='genre not found')
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=GENRES_MSG)
     return Genre(**genre.dict())

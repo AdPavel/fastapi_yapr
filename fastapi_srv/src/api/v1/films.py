@@ -1,11 +1,12 @@
 from http import HTTPStatus
 from uuid import UUID
 
-from src.api.v1.models.query_models import Sort
-from src.api.v1.models.response_models import Film, BaseFilm
+from api.v1.models.query_models import Sort
+from api.v1.models.response_models import Film, BaseFilm
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_cache.decorator import cache
-from src.services.film import FilmService, get_service
+from services.film import FilmService, get_service
+from api.v1.message import FILMS_MSG
 
 router = APIRouter()
 
@@ -27,7 +28,7 @@ async def search_films(
     films = await film_service.get_all_from_elastic(page=page, size=size, query=query,
                                                     fields=['title', 'description'], key='movies')
     if not films:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FILMS_MSG)
 
     return [BaseFilm(**film.dict()) for film in films]
 
@@ -46,7 +47,7 @@ async def film_details(
 ) -> Film:
     film = await film_service.get_by_id(film_id, key='movies')
     if not film:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FILMS_MSG)
 
     return Film(**film.dict())
 
@@ -69,7 +70,7 @@ async def get_films_by_genre(
 
     films = await film_service.get_films_genre_sort(page=page, size=size, genre_id=genre, sort_=sort.value)
     if not films:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FILMS_MSG)
 
     return [BaseFilm(**film.dict()) for film in films]
 
