@@ -1,5 +1,4 @@
 from functools import lru_cache
-from typing import Optional
 from uuid import UUID
 
 from db.elastic import get_elastic
@@ -11,7 +10,7 @@ from services.common import Service
 
 class PersonService(Service):
 
-    async def get_persons_film(self, person_id: UUID = None) -> Optional[list[Film]]:
+    async def get_persons_film(self, person_id: UUID = None) -> list[Film] | None:
         person = await super().get_by_id(_id=person_id, key='persons')
         film_ids = person.film_ids
         body = {'query': {'ids': {'values': film_ids}}}

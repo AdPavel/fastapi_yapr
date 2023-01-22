@@ -1,5 +1,4 @@
 from functools import lru_cache
-from typing import Union
 from uuid import UUID
 
 from elasticsearch import AsyncElasticsearch, NotFoundError
@@ -20,7 +19,7 @@ class Service:
 
     async def get_all_from_elastic(
         self, page: int, size: int, key: str, fields: list = None, query: str = None
-    ) -> Union[None, list[Film], list[Genre], list[Person]]:
+    ) -> None | list[Film] | list[Genre] | list[Person]:
 
         if query:
             body = {
@@ -47,7 +46,7 @@ class Service:
             return None
         return [models_dict[key](**doc['_source']) for doc in docs]
 
-    async def get_by_id(self, _id: UUID, key: str) -> Union[None, Genre, Film, Person]:
+    async def get_by_id(self, _id: UUID, key: str) -> None | Genre | Film | Person:
         try:
             doc = await self.elastic.get(key, _id)
         except NotFoundError:

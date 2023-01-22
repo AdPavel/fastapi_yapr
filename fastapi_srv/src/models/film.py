@@ -1,4 +1,3 @@
-from typing import Optional, List
 from uuid import UUID
 from pydantic import Field
 
@@ -10,12 +9,12 @@ from .person import Person
 class Film(BaseConfig):
     uuid: UUID = Field(alias='id')
     title: str
-    description: Optional[str] = ''
-    genre: Optional[List[Genre]] = []
-    imdb_rating: Optional[float] = 0
-    directors: Optional[List[Person]] = []
-    writers: Optional[List[Person]] = []
-    actors: Optional[List[Person]] = []
-    directors_names: Optional[List[str]] = []
-    writers_names: Optional[List[str]] = []
-    actors_names: Optional[List[str]] = []
+    description: str | None = ''
+    genre: list[Genre] | None = []
+    imdb_rating: float | None = 0
+    directors: list[Person] | None = []
+    writers: list[Person] | None = []
+    actors: list[Person] | None = []
+    directors_names: list[str] | None = []
+    writers_names: list[str] | None = []
+    actors_names: list[str] | None = []

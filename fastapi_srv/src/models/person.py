@@ -1,5 +1,4 @@
 from uuid import UUID
-from typing import Optional, List
 from pydantic import Field
 
 from .config_models import BaseConfig
@@ -11,5 +10,5 @@ class Person(BaseConfig):
 
 
 class ExtendedPerson(Person):
-    role: Optional[List[str]] = []
-    film_ids: Optional[List[UUID]] = []
+    role: list[str] | None = []
+    film_ids: list[UUID] | None = []

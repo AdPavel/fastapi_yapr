@@ -1,5 +1,4 @@
 from functools import lru_cache
-from typing import Optional
 from uuid import UUID
 
 from db.elastic import get_elastic
@@ -13,7 +12,7 @@ class FilmService(Service):
 
     async def get_films_genre_sort(
         self, page: int, size: int, genre_id: UUID = None, sort_: str = None
-    ) -> Optional[list[Film]]:
+    ) -> list[Film] | None:
 
         if genre_id:
             body = {'query': {'nested': {'path': 'genre', 'query': {'match': {'genre.id': genre_id}}}}}
