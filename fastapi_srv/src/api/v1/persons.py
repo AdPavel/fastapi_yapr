@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from uuid import UUID
 from fastapi_cache.decorator import cache
 
-from services.person import PersonService, get_service
-from api.v1.models.response_models import Person, Film, BaseFilm
+from src.services.person import PersonService, get_service
+from src.api.v1.models.response_models import Person, Film, BaseFilm
 
 router = APIRouter()
 

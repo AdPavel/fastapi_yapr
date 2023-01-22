@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from models.config_models import BaseModel
+from src.models.config_models import BaseModel
 
 
 class Genre(BaseModel):

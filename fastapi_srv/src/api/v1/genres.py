@@ -1,10 +1,10 @@
 from http import HTTPStatus
 from uuid import UUID
 
-from api.v1.models.response_models import Genre
+from src.api.v1.models.response_models import Genre
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_cache.decorator import cache
-from services.common import Service, get_service
+from src.services.common import Service, get_service
 
 router = APIRouter()
 

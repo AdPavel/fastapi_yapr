@@ -1,11 +1,11 @@
 from functools import lru_cache
 from uuid import UUID
 
-from db.elastic import get_elastic
+from src.db.elastic import get_elastic
 from elasticsearch import AsyncElasticsearch, NotFoundError
 from fastapi import Depends
-from models.film import Film
-from services.common import Service
+from src.models.film import Film
+from src.services.common import Service
 
 
 class PersonService(Service):

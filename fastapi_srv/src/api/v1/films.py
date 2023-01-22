@@ -1,11 +1,11 @@
 from http import HTTPStatus
 from uuid import UUID
 
-from api.v1.models.query_models import Sort
-from api.v1.models.response_models import Film, BaseFilm
+from src.api.v1.models.query_models import Sort
+from src.api.v1.models.response_models import Film, BaseFilm
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_cache.decorator import cache
-from services.film import FilmService, get_service
+from src.services.film import FilmService, get_service
 
 router = APIRouter()
 
