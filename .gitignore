@@ -7,5 +7,5 @@ db/pg_data/
 .venv/
 /.env.db.dev
 /.env.dev
-/.env.test
-/.env.test.dev
+/tests/functional/.env.test.dev
+/tests/functional/.env.test.dev
