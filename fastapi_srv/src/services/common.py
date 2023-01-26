@@ -4,10 +4,10 @@ from uuid import UUID
 from elasticsearch import AsyncElasticsearch, NotFoundError
 from fastapi import Depends
 
-from src.db.elastic import get_elastic
-from src.models.genre import Genre
-from src.models.film import Film
-from src.models.person import ExtendedPerson as Person
+from db.elastic import get_elastic
+from models.genre import Genre
+from models.film import Film
+from models.person import ExtendedPerson as Person
 
 
 models_dict = {'genres': Genre, 'movies': Film, 'persons': Person}

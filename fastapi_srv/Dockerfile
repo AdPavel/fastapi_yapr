@@ -1,5 +1,4 @@
 FROM python:3.10-alpine as base
-
 FROM base as builder
 RUN mkdir /install
 WORKDIR /install
@@ -13,4 +12,5 @@ RUN pip install --upgrade pip \
     && pip install -r requirements.txt
 COPY . .
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port=8001"]
+WORKDIR /fastapi_srv/src
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port=8001"]
