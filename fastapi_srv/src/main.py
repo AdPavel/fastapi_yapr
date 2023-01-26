@@ -7,10 +7,10 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio
 
-from src.api.v1 import films, genres, persons
-from src.core.logger import LOGGING
-from src.core.settings import settings
-from src.db import elastic, redis
+from api.v1 import films, genres, persons
+from core.logger import LOGGING
+from core.settings import settings
+from db import elastic, redis
 
 
 logging_config.dictConfig(LOGGING)
