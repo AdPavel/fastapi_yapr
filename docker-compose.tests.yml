@@ -1,0 +1,32 @@
+version: '3.7'
+services:
+  redis_test:
+    container_name: redis_test
+    image: redis:alpine
+
+  els_test:
+    container_name: elasticDB_test
+    image: elasticsearch:7.13.0
+    environment:
+      discovery.type: "single-node"
+      ES_JAVA_OPTS: "-Xms200m -Xmx200m"
+      xpack.security.enabled: "false"
+    expose:
+      - "9200"
+
+  fastapi_test:
+    container_name: fastapi_test
+    build: ./fastapi_srv
+    image: fastapi-image
+    env_file: ./.env
+    expose:
+      - "8001"
+    depends_on:
+      - redis_test
+      - els_test
+
+  tests:
+    container_name: tests
+    build: ./tests/functional
+    env_file: ./tests/functional/.env
+    entrypoint: /tests/functional/run_tests.sh

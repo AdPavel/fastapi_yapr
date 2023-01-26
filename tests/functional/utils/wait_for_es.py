@@ -1,8 +1,8 @@
-from functional.src.settings import settings
-
 import time
-
 from elasticsearch import Elasticsearch
+import sys; sys.path.append("..")
+from tests.functional.settings import settings
+
 
 if __name__ == '__main__':
     es_client = Elasticsearch(
