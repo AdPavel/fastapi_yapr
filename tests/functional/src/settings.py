@@ -1,6 +1,9 @@
 import pathlib
 from pydantic import BaseSettings
 
+LOCAL_ENV = '.env.dev'
+DOCKER_ENV = '.env'
+
 
 class Base(BaseSettings):
     # Project section
@@ -16,7 +19,7 @@ class Base(BaseSettings):
 
     class Config:
 
-        env_file = f"{pathlib.Path(__file__).resolve().parent.parent.parent.parent}/.env"
+        env_file = f"{pathlib.Path(__file__).resolve().parent.parent.parent.parent}/{DOCKER_ENV}"
         env_file_encoding = 'utf-8'
 
 
