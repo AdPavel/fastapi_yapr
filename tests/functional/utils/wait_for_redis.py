@@ -1,4 +1,4 @@
-from functional.src.settings import settings
+from settings import settings
 
 import time
 
