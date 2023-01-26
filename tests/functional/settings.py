@@ -16,7 +16,7 @@ class Base(BaseSettings):
 
     class Config:
 
-        env_file = f"{pathlib.Path(__file__).resolve().parent.parent.parent}/.env.test"
+        env_file = f"{pathlib.Path(__file__).resolve().parent}/.env"
         env_file_encoding = 'utf-8'
 
 
