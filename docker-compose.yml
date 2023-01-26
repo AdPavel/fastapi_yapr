@@ -54,6 +54,7 @@ services:
   fastapi:
     container_name: fastapi
     build: ./fastapi_srv
+    image: fastapi-image
     env_file: ./.env
     expose:
       - "8001"
@@ -61,6 +62,12 @@ services:
       - redis
       - els
       - etl
+
+  tests:
+    container_name: tests
+    image: fastapi-image
+    env_file: ./.env
+    entrypoint:
 
   nginx:
     container_name: dev_web
