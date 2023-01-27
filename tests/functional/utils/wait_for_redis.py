@@ -1,7 +1,11 @@
 import time
 from redis import Redis
-import sys; sys.path.append("..")
-from tests.functional.settings import settings
+import sys
+import os
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+from settings import settings
 
 if __name__ == '__main__':
     redis_client = Redis(
