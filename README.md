@@ -2,7 +2,7 @@
 ## Инструкция по тестированию
 Выполните команду
 ```
-docker-compose -f tests/functional/docker-compose.tests.yml up --build
+docker-compose -f tests/functional/docker-compose.tests.yml up --build -d
 ```
 ## Инструкция по запуску
 1. Создайте файлы `.env` и `.env.db` и заполните их по аналогии с `.env.example` и `.env.db.example`.
