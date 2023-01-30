@@ -7,6 +7,7 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 from settings import settings
 
+
 if __name__ == '__main__':
     redis_client = Redis(
         host=settings.redis_host, port=settings.redis_port,
