@@ -18,8 +18,8 @@ services:
     expose:
       - "9200"
 
-  fastapi_test:
-    container_name: fastapi_test
+  fastapi:
+    container_name: fastapi
     build: ../../fastapi_srv
     image: fastapi-image
     env_file: ../../.env
@@ -30,6 +30,18 @@ services:
     depends_on:
       - redis
       - els
+
+  kibana:
+    container_name: kibana
+    image: kibana:7.13.0
+    volumes:
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+    depends_on:
+      - els
+    ports:
+      - 5601:5601
+    expose:
+      - "5601"
 
 #  tests:
 #    container_name: tests
