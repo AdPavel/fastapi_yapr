@@ -1,12 +1,12 @@
 from http import HTTPStatus
 from uuid import UUID
 
+from api.v1.message import FILMS_MSG
 from api.v1.models.query_models import Sort
 from api.v1.models.response_models import Film, BaseFilm
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_cache.decorator import cache
 from services.film import FilmService, get_service
-from api.v1.message import FILMS_MSG
 
 router = APIRouter()
 
@@ -25,8 +25,8 @@ async def search_films(
         size: int = Query(default=50, ge=1, alias='page[size]', title='Количество фильмов на странице'),
         film_service: FilmService = Depends(get_service)
 ) -> list[BaseFilm]:
-    films = await film_service.get_all_from_elastic(page=page, size=size, query=query,
-                                                    fields=['title', 'description'], key='movies')
+    films = await film_service.get_all(page=page, size=size, query=query,
+                                       fields=['title', 'description'], key='movies')
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FILMS_MSG)
 
