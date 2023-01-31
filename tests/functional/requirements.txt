@@ -7,3 +7,5 @@ python-dotenv==0.21.0
 redis==4.4.2
 uvicorn==0.12.2
 elasticsearch[async]==7.9.1
+aioredis==2.0.1
+asyncio==3.4.3

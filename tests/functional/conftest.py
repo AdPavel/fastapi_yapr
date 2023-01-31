@@ -1,14 +1,14 @@
 import asyncio
-import uuid
-
+import json
 import aiohttp
 import pytest
 import pytest_asyncio
-from elasticsearch import AsyncElasticsearch, helpers
-from settings import settings
-from utils.es_helper import prepare_for_es_insert, prepare_for_es_delete
+from elasticsearch import AsyncElasticsearch
+from .settings import settings
+from .utils.es_helper import prepare_for_es_insert, prepare_for_es_delete
 
-from testdata.data import films_data
+from .testdata.data import films_data, persons_data, genres_data
+
 
 @pytest.fixture(scope="session")
 def event_loop():
@@ -25,6 +25,8 @@ async def es_client():
         host=settings.els_host,
         port=settings.els_port
     )
+    # !!! Обязательно заменить hosts, сейчас для теста
+    # client = AsyncElasticsearch(hosts=f'http://localhost:9200')
     client = AsyncElasticsearch(hosts=es_url)
     yield client
     await client.close()
@@ -35,84 +37,35 @@ async def session():
     session = aiohttp.ClientSession()
     yield session
     await session.close()
+
+
+async def create_data(es_client: AsyncElasticsearch, index: str, data: list[dict]):
+
+    els_schema_path = f'/functional/testdata/indexes/{index}.json'
+    if not await es_client.indices.exists(index):
+        with open(els_schema_path, 'r') as file:
+            schema = json.load(file)
+        await es_client.indices.create(index=index, body=schema)
+    await es_client.indices.refresh(index=index)
+    response = await es_client.bulk(index=index, body=prepare_for_es_insert(data, index), refresh=True)
+    await es_client.close()
+    if response['errors']:
+        raise Exception('Ошибка записи данных в Elasticsearch')
+
+
+@pytest_asyncio.fixture(scope='session', autouse=True)
+async def create_films(es_client):
+    await create_data(es_client=es_client, index='movies', data=films_data.data)
+
+
+# @pytest_asyncio.fixture(scope='session', autouse=True)
+# async def create_persons(es_client):
+#     await create_data(es_client=es_client, index='persons', data=persons_data.data)
 #
-# @pytest_asyncio.fixture(scope='session')
-# async def create_film(es_client):
-#     index = 'movies'
-#     data = [
-#         {
-#             'id': str(uuid.uuid4()),
-#             'imdb_rating': 8.5,
-#             'genre': [
-#                 {'id': str(uuid.uuid4()), 'name': 'Action'},
-#                 {'id': str(uuid.uuid4()), 'name': 'Sci-Fi'}
-#             ],
-#             'title': 'The Star',
-#             'description': 'New World',
-#             'directors_names': ['Stan', 'Quentin'],
-#             'actors_names': ['Ann', 'Bob'],
-#             'writers_names': ['Ben', 'Howard'],
-#             'directors': [
-#                 {'id': str(uuid.uuid4()), 'name': 'Ann'},
-#                 {'id': str(uuid.uuid4()), 'name': 'Bob'}
-#             ],
-#             'actors': [
-#                 {'id': str(uuid.uuid4()), 'name': 'Ann'},
-#                 {'id': str(uuid.uuid4()), 'name': 'Bob'}
-#             ],
-#             'writers': [
-#                 {'id': str(uuid.uuid4()), 'name': 'Ben'},
-#                 {'id': str(uuid.uuid4()), 'name': 'Howard'}
-#             ],
-#         }
-#     ]
 #
-#     # await helpers.async_bulk(es_client, prepare_for_es_insert(data, index))
-#     await es_client.indices.refresh(index=index)
-#     # await asyncio.sleep(1)
-#
-#     yield data
-#
-#     # await helpers.async_bulk(es_client, prepare_for_es_delete(data, index))
-
-
-# async def create_data(es_client: AsyncElasticsearch, index: str):
-#     # els_schema_path = f'testdata/indexes/{index}.json'
-#     #
-#     # # if not await es_client.indices.exists(index=index):
-#     # #     await es_client.indices.create(index, body=els_schema_path)
-#     # # # if not await es_client.indices.exists(index=index):
-#     # # #     await es_client.indices.create(index, els_schema_path['body'])
-#     # # # bulk_query = []
-#     # # # for row in data:
-#     # # #     action = {"index": {"_index": index_name, "_id": row["id"]}}
-#     # # #     doc = row
-#     # # #     bulk_query.append(action)
-#     # # #     bulk_query.append(doc)
-#     # # await async_bulk(es_client, prepare_for_es_insert(films_data.data, index))
-#     # data = prepare_for_es_insert(films_data.data, 'movies')
-#     # response = await es_client.bulk(index=index, body=data, refresh=True)
-#     # await es_client.close()
-#     # if response['errors']:
-#     #     raise Exception('Ошибка записи данных в Elasticsearch')
-#     # await es_client.indices.refresh(index=index)
-#     # await asyncio.sleep(1)
-
-
-@pytest.fixture
-def create_film():
-    async def inner(data=films_data.data):
-        bulk_query = prepare_for_es_insert(data, 'movies')
-
-        es_client = AsyncElasticsearch(hosts=f'http://{settings.els_host}:{settings.els_port}',
-                                       validate_cert=False,
-                                       use_ssl=False)
-        response = await es_client.bulk(bulk_query, refresh=True)
-        await es_client.close()
-        if response['errors']:
-            raise Exception('Ошибка записи данных в Elasticsearch')
-
-    return inner
+# @pytest_asyncio.fixture(scope='session', autouse=True)
+# async def create_genres(es_client):
+#     await create_data(es_client=es_client, index='genres', data=genres_data.data)
 
 
 @pytest_asyncio.fixture(scope='session')
