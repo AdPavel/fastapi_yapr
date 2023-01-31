@@ -9,3 +9,4 @@ db/pg_data/
 /.env.dev
 /tests/functional/.env.test.dev
 /tests/functional/.env.test.dev
+.pytest_cache/

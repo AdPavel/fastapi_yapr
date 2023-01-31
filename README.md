@@ -1,13 +1,8 @@
 # Асинхронный API для кинотеатра
 ## Инструкция по тестированию
-1. Создайте файл в директории /tests/functional `.env` и заполните его по аналогии с `.env.example`.
-2. Выполните команду
+Выполните команду
 ```
-docker-compose -f docker-compose.tests.yml -p TESTS  up --build
-```
-Чтобы остановить контейнер и удалить volumes выполните команду
-```
-docker-compose -f docker-compose.mac.yml down
+docker-compose -f tests/functional/docker-compose.tests.yml up --build -d
 ```
 ## Инструкция по запуску
 1. Создайте файлы `.env` и `.env.db` и заполните их по аналогии с `.env.example` и `.env.db.example`.
