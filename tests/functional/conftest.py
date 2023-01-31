@@ -48,7 +48,6 @@ async def create_data(es_client: AsyncElasticsearch, index: str, data: list[dict
         await es_client.indices.create(index=index, body=schema)
     await es_client.indices.refresh(index=index)
     response = await es_client.bulk(index=index, body=prepare_for_es_insert(data, index), refresh=True)
-    await es_client.close()
     if response['errors']:
         raise Exception('Ошибка записи данных в Elasticsearch')
 
@@ -61,14 +60,14 @@ async def create_films(es_client):
 # @pytest_asyncio.fixture(scope='session', autouse=True)
 # async def create_persons(es_client):
 #     await create_data(es_client=es_client, index='persons', data=persons_data.data)
-#
-#
-# @pytest_asyncio.fixture(scope='session', autouse=True)
-# async def create_genres(es_client):
-#     await create_data(es_client=es_client, index='genres', data=genres_data.data)
 
 
-@pytest_asyncio.fixture(scope='session')
+@pytest_asyncio.fixture(scope='session', autouse=True)
+async def create_genres(es_client):
+    await create_data(es_client=es_client, index='genres', data=genres_data.data)
+
+
+@pytest_asyncio.fixture
 def make_request(session):
     async def inner(endpoint: str, params: dict = {}) -> dict:
 
@@ -83,5 +82,3 @@ def make_request(session):
             return response
 
     return inner
-
-
