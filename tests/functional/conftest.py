@@ -59,9 +59,9 @@ async def create_films(es_client):
     await create_data(es_client=es_client, index='movies', data=films_data.data)
 
 
-# @pytest_asyncio.fixture(scope='session', autouse=True)
-# async def create_persons(es_client):
-#     await create_data(es_client=es_client, index='persons', data=persons_data.data)
+@pytest_asyncio.fixture(scope='session', autouse=True)
+async def create_persons(es_client):
+    await create_data(es_client=es_client, index='persons', data=persons_data.data)
 
 
 @pytest_asyncio.fixture(scope='session', autouse=True)
