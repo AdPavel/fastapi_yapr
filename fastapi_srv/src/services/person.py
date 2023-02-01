@@ -2,30 +2,24 @@ from functools import lru_cache
 from uuid import UUID
 
 from db.elastic import get_elastic
-from elasticsearch import AsyncElasticsearch, NotFoundError
+from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
 from models.film import Film
 from services.common import Service
+from storages.film_storage import ElasiticFilmStorage
 
 
 class PersonService(Service):
 
     async def get_persons_film(self, person_id: UUID = None) -> list[Film] | None:
-        person = await super().get_by_id(_id=person_id, key='persons')
-        film_ids = person.film_ids
-        body = {'query': {'ids': {'values': film_ids}}}
 
-        try:
-            result = await self.elastic.search(index='movies', body=body)
-            docs = result['hits']['hits']
-        except NotFoundError:
-            return None
-        ls = [Film(**doc['_source']) for doc in docs]
-        return ls
+        data = await self.storage.get_persons_film(person_id)
+        return data
 
 
 @lru_cache()
 def get_service(
     elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> PersonService:
-    return PersonService(elastic)
+    storage = ElasiticFilmStorage(elastic)
+    return PersonService(storage)

@@ -1,12 +1,11 @@
 from http import HTTPStatus
-
-from fastapi import APIRouter, Depends, HTTPException, Query
 from uuid import UUID
-from fastapi_cache.decorator import cache
 
-from services.person import PersonService, get_service
-from api.v1.models.response_models import Person, BaseFilm
 from api.v1.message import PERSON_MSG
+from api.v1.models.response_models import Person, BaseFilm
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi_cache.decorator import cache
+from services.person import PersonService, get_service
 
 router = APIRouter()
 
@@ -25,8 +24,8 @@ async def search_person(
         size: int = Query(default=50, ge=1, alias='page[size]', title='Количество персон на странице'),
         person_service: PersonService = Depends(get_service)
 ) -> list[Person]:
-    persons = await person_service.get_all_from_elastic(page=page, size=size, key='persons',
-                                                        query=query, fields=['name'])
+    persons = await person_service.get_all(page=page, size=size, key='persons',
+                                           query=query, fields=['name'])
     if not persons:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=PERSON_MSG)
 
@@ -47,7 +46,7 @@ async def persons_list(
         person_service: PersonService = Depends(get_service)
 ) -> list[Person]:
 
-    persons = await person_service.get_all_from_elastic(page=page, size=size, key='persons')
+    persons = await person_service.get_all(page=page, size=size, key='persons')
     if not persons:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=PERSON_MSG)
 
