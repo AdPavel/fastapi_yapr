@@ -31,5 +31,4 @@ services:
     volumes:
       - ./:/functional
     env_file: ../../.env
-#    entrypoint: tail -F anything
     entrypoint: /functional/script/run_tests.sh
