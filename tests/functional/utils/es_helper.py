@@ -1,4 +1,3 @@
-from typing import Generator
 import json
 
 
@@ -13,12 +12,3 @@ def prepare_for_es_insert(data: list[dict], index: str) -> str:
 
     str_query = '\n'.join(bulk_query) + '\n'
     return str_query
-
-
-def prepare_for_es_delete(data: list[dict], index: str) -> Generator:
-    for obj in data:
-        yield {
-            '_op_type': 'delete',
-            '_index': index,
-            '_id': obj['id'],
-        }
