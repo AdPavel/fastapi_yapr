@@ -5,7 +5,7 @@ import pytest
 import pytest_asyncio
 from elasticsearch import AsyncElasticsearch
 from .settings import settings
-from .utils.es_helper import prepare_for_es_insert, prepare_for_es_delete
+from .utils.es_helper import prepare_for_es_insert
 
 from .testdata.data import films_data, persons_data, genres_data
 
