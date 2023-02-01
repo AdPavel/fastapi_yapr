@@ -14,8 +14,8 @@ services:
     expose:
       - "9200"
 
-  fastapi_test:
-    container_name: fastapi_test
+  fastapi:
+    container_name: fastapi
     build: ../../fastapi_srv
     image: fastapi-image
     env_file: ../../.env
@@ -31,5 +31,4 @@ services:
     volumes:
       - ./:/functional
     env_file: ../../.env
-#    entrypoint: tail -F anything
     entrypoint: /functional/script/run_tests.sh
