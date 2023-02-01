@@ -42,6 +42,8 @@ async def session():
 async def create_data(es_client: AsyncElasticsearch, index: str, data: list[dict]):
 
     els_schema_path = f'/functional/testdata/indexes/{index}.json'
+    # Для локального запуска
+    # els_schema_path = f'../testdata/indexes/{index}.json'
     if not await es_client.indices.exists(index):
         with open(els_schema_path, 'r') as file:
             schema = json.load(file)
