@@ -1,5 +1,5 @@
 import pytest
-import uuid
+
 
 @pytest.mark.parametrize(
     'query_data, expected_answer',
