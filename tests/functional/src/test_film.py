@@ -49,7 +49,7 @@ async def test_film_search(make_request, query_data: dict, expected_answer: dict
 
 
 @pytest.mark.asyncio
-async def test_cache_film(make_request, es_client):
+async def test_cache_film(make_request, es_client, redis_client):
 
     film_id = '647d1ac4-0f5a-465b-a75c-45941d28198b'
     response_before_delete = await make_request(endpoint=f'/films/{film_id}')
@@ -57,6 +57,10 @@ async def test_cache_film(make_request, es_client):
 
     await es_client.delete('movies', film_id)
 
+    cache_key = 'movies:api.v1.films:film_details:647d1ac4-0f5a-465b-a75c-45941d28198b'
+    redis_data = redis_client.get(cache_key)
+
     response_after_delete = await make_request(f'/films/{film_id}/')
+    assert redis_data
     assert response_after_delete['status'] == 200
     assert response_before_delete['body'] == response_after_delete['body']
