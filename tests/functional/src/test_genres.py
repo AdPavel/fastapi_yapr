@@ -30,7 +30,7 @@ async def test_genres_list(make_request):
 
 
 @pytest.mark.asyncio
-async def test_cache_genre(make_request, es_client):
+async def test_cache_genre(make_request, es_client, redis_client):
 
     genre_id = uuid.uuid4()
     data = {'id': genre_id, 'name': 'Test'}
@@ -41,6 +41,10 @@ async def test_cache_genre(make_request, es_client):
 
     await es_client.delete('genres', genre_id)
 
+    cache_key = f'genres:api.v1.genres:genres_detail:{genre_id}'
+    redis_data = redis_client.get(cache_key)
+
     response_after_delete = await make_request(f'/genres/{genre_id}/')
+    assert redis_data
     assert response_after_delete['status'] == 200
     assert response_before_delete['body'] == response_after_delete['body']
