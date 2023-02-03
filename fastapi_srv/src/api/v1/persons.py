@@ -15,12 +15,12 @@ router = APIRouter()
 
 
 def redis_persons_key_by_id(
-    func,
-    namespace: Optional[str] = '',
-    request: Request = None,
-    response: Response = None,
-    *args,
-    **kwargs,
+        func,
+        namespace: Optional[str] = "",
+        request: Request = None,
+        response: Response = None,
+        *args,
+        **kwargs,
 ):
     prefix = 'persons'
     cache_key = f"{prefix}:{func.__module__}:{func.__name__}:{kwargs['kwargs']['person_id']}"
