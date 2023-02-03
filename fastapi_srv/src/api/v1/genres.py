@@ -7,7 +7,24 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_cache.decorator import cache
 from services.common import Service, get_service
 
+from typing import Optional
+from starlette.requests import Request
+from starlette.responses import Response
+
 router = APIRouter()
+
+
+def redis_genres_key_by_id(
+        func,
+        namespace: Optional[str] = "",
+        request: Request = None,
+        response: Response = None,
+        *args,
+        **kwargs,
+):
+    prefix = 'genres'
+    cache_key = f"{prefix}:{func.__module__}:{func.__name__}:{kwargs['kwargs']['genre_id']}"
+    return cache_key
 
 
 @router.get(
@@ -38,7 +55,7 @@ async def genres_list(
     description="Подробнее по жанру",
     response_description="Подробнее по жанру"
 )
-@cache()
+@cache(key_builder=redis_genres_key_by_id)
 async def genres_detail(genre_id: UUID, genre_service: Service = Depends(get_service)) -> Genre:
     genre = await genre_service.get_by_id(genre_id, key='genres')
     if not genre:

@@ -8,7 +8,24 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_cache.decorator import cache
 from services.film import FilmService, get_service
 
+from typing import Optional
+from starlette.requests import Request
+from starlette.responses import Response
+
 router = APIRouter()
+
+
+def redis_film_key_by_id(
+        func,
+        namespace: Optional[str] = "",
+        request: Request = None,
+        response: Response = None,
+        *args,
+        **kwargs,
+):
+    prefix = 'movies'
+    cache_key = f"{prefix}:{func.__module__}:{func.__name__}:{kwargs['kwargs']['film_id']}"
+    return cache_key
 
 
 @router.get(
@@ -40,7 +57,7 @@ async def search_films(
     description="Детализированная информация по фильму",
     response_description="Детализированная информация по фильму"
 )
-@cache()
+@cache(key_builder=redis_film_key_by_id)
 async def film_details(
         film_id: UUID,
         film_service: FilmService = Depends(get_service)
