@@ -1,6 +1,6 @@
 import pytest
 import uuid
-
+import json
 
 @pytest.mark.parametrize(
     'query_data, expected_answer',
@@ -42,9 +42,9 @@ async def test_cache_genre(make_request, es_client, redis_client):
     await es_client.delete('genres', genre_id)
 
     cache_key = f'genres:api.v1.genres:genres_detail:{genre_id}'
-    redis_data = redis_client.get(cache_key)
+    redis_data = await redis_client.get(cache_key)
 
     response_after_delete = await make_request(f'/genres/{genre_id}/')
-    assert redis_data
+    assert json.loads(redis_data) == response_before_delete['body']
     assert response_after_delete['status'] == 200
     assert response_before_delete['body'] == response_after_delete['body']
