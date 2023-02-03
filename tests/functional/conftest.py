@@ -36,12 +36,10 @@ async def es_client():
 @pytest_asyncio.fixture(scope='session')
 async def redis_client():
     redis_url = 'redis://{host}:{port}'.format(
-            host=settings.redis_host,
-            port=settings.redis_port
-        )
+        host=settings.redis_host,
+        port=settings.redis_port
+    )
     client = await rasyncio.from_url(redis_url, encoding='utf8', decode_responses=True)
-    # !!! Обязательно заменить hosts, сейчас для теста
-    # client = rasyncio.from_url('redis://localhost:6379', encoding='utf8', decode_responses=True)
     yield client
     await client.close()
 
@@ -73,9 +71,9 @@ async def create_films(es_client):
     await create_data(es_client=es_client, index='movies', data=films_data.data)
 
 
-# @pytest_asyncio.fixture(scope='session', autouse=True)
-# async def create_persons(es_client):
-#     await create_data(es_client=es_client, index='persons', data=persons_data.data)
+@pytest_asyncio.fixture(scope='session', autouse=True)
+async def create_persons(es_client):
+    await create_data(es_client=es_client, index='persons', data=persons_data.data)
 
 
 @pytest_asyncio.fixture(scope='session', autouse=True)

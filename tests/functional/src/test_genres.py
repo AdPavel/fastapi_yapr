@@ -6,12 +6,12 @@ import json
     'query_data, expected_answer',
     [
         (
-                {'query': '/genres/640d1ac4-0f5a-465b-a75c-45941d28198b'},
-                {'status': 200, 'length': 3}
+            {'query': '/genres/640d1ac4-0f5a-465b-a75c-45941d28198b'},
+            {'status': 200, 'length': 3}
         ),
         (
-                {'query': '/genres/640d1ac4-0f5a-465b-a75c-45941d281900'},
-                {'status': 404, 'length': 1}
+            {'query': '/genres/640d1ac4-0f5a-465b-a75c-45941d281900'},
+            {'status': 404, 'length': 1}
         )
     ]
 )

@@ -73,6 +73,8 @@ class ElasiticFilmStorage(BaseFilmStorage):
 
     async def get_persons_film(self, person_id: UUID = None) -> list[Film] | None:
         person = await self.get_by_id(_id=person_id, key='persons')
+        if not person:
+            return None
         film_ids = person.film_ids
         body = {'query': {'ids': {'values': film_ids}}}
 
