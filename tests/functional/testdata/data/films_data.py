@@ -3,7 +3,7 @@ import uuid
 data_with_freeze_id = [
         {
             'id': "647d1ac4-0f5a-465b-a75c-45941d28198b",
-            'imdb_rating': 8.5,
+            'imdb_rating': 1.5,
             'genre': [
                 {'id': str(uuid.uuid4()), 'name': 'Action'},
                 {'id': str(uuid.uuid4()), 'name': 'Sci-Fi'}
