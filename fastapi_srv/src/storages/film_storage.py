@@ -1,5 +1,6 @@
 from uuid import UUID
 
+import backoff
 from elasticsearch import AsyncElasticsearch, NotFoundError
 from models.film import Film
 from models.genre import Genre
@@ -14,6 +15,10 @@ class ElasiticFilmStorage(BaseFilmStorage):
     def __init__(self, elastic: AsyncElasticsearch):
         self.elastic = elastic
 
+    @backoff.on_exception(
+        wait_gen=backoff.expo, exception=Exception,
+        max_tries=10
+    )
     async def get_by_id(self, _id: UUID, key: str) -> None | Genre | Film | Person:
         try:
             doc = await self.elastic.get(key, _id)
@@ -21,6 +26,10 @@ class ElasiticFilmStorage(BaseFilmStorage):
             return None
         return models_dict[key](**doc['_source'])
 
+    @backoff.on_exception(
+        wait_gen=backoff.expo, exception=Exception,
+        max_tries=10
+    )
     async def get_all(
         self, page: int, size: int, key: str, fields: list = None, query: str = None
     ) -> None | list[Film] | list[Genre] | list[Person]:
@@ -50,6 +59,10 @@ class ElasiticFilmStorage(BaseFilmStorage):
             return None
         return [models_dict[key](**doc['_source']) for doc in docs]
 
+    @backoff.on_exception(
+        wait_gen=backoff.expo, exception=Exception,
+        max_tries=10
+    )
     async def get_films_genre_sort(
         self, page: int, size: int, genre_id: UUID = None, sort_: str = None
     ) -> list[Film] | None:
@@ -71,6 +84,10 @@ class ElasiticFilmStorage(BaseFilmStorage):
             return None
         return [Film(**doc['_source']) for doc in docs]
 
+    @backoff.on_exception(
+        wait_gen=backoff.expo, exception=Exception,
+        max_tries=10
+    )
     async def get_persons_film(self, person_id: UUID = None) -> list[Film] | None:
         person = await self.get_by_id(_id=person_id, key='persons')
         film_ids = person.film_ids
