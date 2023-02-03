@@ -1,5 +1,5 @@
 import pytest
-
+import json
 
 @pytest.mark.parametrize(
     'query_data, expected_answer',
@@ -34,7 +34,12 @@ async def test_get_sort_films(make_request):
                                                params={'sort': '-imdb_rating', 'size': 50, 'page': 1})
     response_asc_sorting = await make_request(endpoint='/films/',
                                                params={'sort': 'imdb_rating', 'size': 50, 'page': 1})
-    assert response_asc_sorting['status'] == response_desc_sorting['status']
+    response_wrong_sorting_field = await make_request(endpoint='/films/',
+                                               params={'sort': 'title', 'size': 50, 'page': 1})
+
+    assert response_wrong_sorting_field['status'] == 422
+    assert response_asc_sorting['status'] == 200
+    assert response_desc_sorting['status'] == 200
     assert response_asc_sorting['body'][0]['imdb_rating'] != response_desc_sorting['body'][0]['imdb_rating']
 
 
@@ -67,10 +72,10 @@ async def test_cache_film(make_request, es_client, redis_client):
 
     await es_client.delete('movies', film_id)
 
-    cache_key = 'movies:api.v1.films:film_details:647d1ac4-0f5a-465b-a75c-45941d28198b'
-    redis_data = redis_client.get(cache_key)
+    cache_key = f'movies:api.v1.films:film_details:{film_id}'
+    redis_data = await redis_client.get(cache_key)
 
     response_after_delete = await make_request(f'/films/{film_id}/')
-    assert redis_data
+    assert json.loads(redis_data) == response_before_delete['body']
     assert response_after_delete['status'] == 200
     assert response_before_delete['body'] == response_after_delete['body']
