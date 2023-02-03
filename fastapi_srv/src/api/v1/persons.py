@@ -7,7 +7,24 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_cache.decorator import cache
 from services.person import PersonService, get_service
 
+from typing import Optional
+from starlette.requests import Request
+from starlette.responses import Response
+
 router = APIRouter()
+
+
+def redis_persons_key_by_id(
+    func,
+    namespace: Optional[str] = '',
+    request: Request = None,
+    response: Response = None,
+    *args,
+    **kwargs,
+):
+    prefix = 'persons'
+    cache_key = f"{prefix}:{func.__module__}:{func.__name__}:{kwargs['kwargs']['person_id']}"
+    return cache_key
 
 
 @router.get(
@@ -78,7 +95,7 @@ async def persons_films(
     description="Подробнее по персоне",
     response_description="Подробнее по персоне"
 )
-@cache()
+@cache(key_builder=redis_persons_key_by_id)
 async def persons_detail(
         person_id: UUID,
         person_service: PersonService = Depends(get_service)

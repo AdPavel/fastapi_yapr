@@ -1,5 +1,7 @@
-import pytest
+import json
 import uuid
+
+import pytest
 
 
 @pytest.mark.parametrize(
@@ -70,7 +72,7 @@ async def test_search_person(make_request, query_data: dict, expected_answer: di
 
 
 @pytest.mark.asyncio
-async def test_cache_person(make_request, es_client):
+async def test_cache_person(make_request, es_client, redis_client):
 
     person_id = uuid.uuid4()
     data = {'id': person_id, 'name': 'Test', 'role': [], 'film_ids': []}
@@ -80,6 +82,11 @@ async def test_cache_person(make_request, es_client):
     assert response_before_delete['status'] == 200
 
     await es_client.delete('persons', person_id)
+
+    cache_key = f'persons:api.v1.persons:persons_detail:{person_id}'
+    redis_data = await redis_client.get(cache_key)
+
+    assert json.loads(redis_data) == response_before_delete['body']
 
     response_after_delete = await make_request(f'/persons/{person_id}/')
     assert response_after_delete['status'] == 200

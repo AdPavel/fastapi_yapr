@@ -1,4 +1,5 @@
 import asyncio
+from redis import asyncio as rasyncio
 import json
 import aiohttp
 import pytest
@@ -28,6 +29,17 @@ async def es_client():
     # !!! Обязательно заменить hosts, сейчас для теста
     # client = AsyncElasticsearch(hosts=f'http://localhost:9200')
     client = AsyncElasticsearch(hosts=es_url)
+    yield client
+    await client.close()
+
+
+@pytest_asyncio.fixture(scope='session')
+async def redis_client():
+    redis_url = 'redis://{host}:{port}'.format(
+        host=settings.redis_host,
+        port=settings.redis_port
+    )
+    client = await rasyncio.from_url(redis_url, encoding='utf8', decode_responses=True)
     yield client
     await client.close()
 
