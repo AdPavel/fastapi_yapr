@@ -15,7 +15,7 @@ import pytest
     ]
 )
 @pytest.mark.asyncio
-async def test_get_film_by_id(make_request, query_data, expected_answer):
+async def test_get_film_by_id(make_request, query_data: dict, expected_answer: dict):
     response = await make_request(endpoint=query_data['query'])
     assert response['status'] == expected_answer['status']
     assert len(response['body']) == expected_answer['length']
@@ -26,6 +26,16 @@ async def test_get_films(make_request):
     response = await make_request(endpoint='/films/', params={'sort': 'imdb_rating', 'size': 50, 'page': 1})
     assert response['status'] == 200
     assert len(response['body']) == 50
+
+
+@pytest.mark.asyncio
+async def test_get_sort_films(make_request):
+    response_desc_sorting = await make_request(endpoint='/films/',
+                                               params={'sort': '-imdb_rating', 'size': 50, 'page': 1})
+    response_asc_sorting = await make_request(endpoint='/films/',
+                                               params={'sort': 'imdb_rating', 'size': 50, 'page': 1})
+    assert response_asc_sorting['status'] == response_desc_sorting['status']
+    assert response_asc_sorting['body'][0]['imdb_rating'] != response_desc_sorting['body'][0]['imdb_rating']
 
 
 @pytest.mark.parametrize(
