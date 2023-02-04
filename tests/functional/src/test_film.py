@@ -45,9 +45,10 @@ async def test_get_sort_films(session):
     response_wrong_sorting_field = await make_request(session, endpoint='/films/',
                                                       params={'sort': 'title', 'size': 50, 'page': 1})
 
-    assert response_wrong_sorting_field['status'] == HTTPStatus.UNPROCESSABLE_ENTITY
-    assert response_asc_sorting['status'] == HTTPStatus.OK
     assert response_desc_sorting['status'] == HTTPStatus.OK
+    assert response_asc_sorting['status'] == HTTPStatus.OK
+    assert response_wrong_sorting_field['status'] == HTTPStatus.UNPROCESSABLE_ENTITY
+
     assert response_asc_sorting['body'][0]['imdb_rating'] != response_desc_sorting['body'][0]['imdb_rating']
 
 
@@ -75,15 +76,14 @@ async def test_film_search(session, query_data: dict, expected_answer: dict):
 async def test_cache_film(session, es_client, redis_client):
 
     film_id = '647d1ac4-0f5a-465b-a75c-45941d28198b'
-    response_before_delete = await make_request(session, endpoint=f'/films/{film_id}')
-    assert response_before_delete['status'] == HTTPStatus.OK
-
-    await es_client.delete('movies', film_id)
-
     cache_key = f'movies:api.v1.films:film_details:{film_id}'
-    redis_data = await redis_client.get(cache_key)
 
+    response_before_delete = await make_request(session, endpoint=f'/films/{film_id}')
+    redis_data = await redis_client.get(cache_key)
+    await es_client.delete('movies', film_id)
     response_after_delete = await make_request(session, f'/films/{film_id}/')
+
+    assert response_before_delete['status'] == HTTPStatus.OK
     assert json.loads(redis_data) == response_before_delete['body']
     assert response_after_delete['status'] == HTTPStatus.OK
     assert response_before_delete['body'] == response_after_delete['body']
