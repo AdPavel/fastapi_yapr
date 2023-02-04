@@ -9,7 +9,7 @@ RUN apk --no-cache add libpq
 WORKDIR /fastapi_srv
 COPY requirements.txt requirements.txt
 RUN pip install --upgrade pip \
-    && pip install -r requirements.txt
+    && pip install -r requirements.txt --default-timeout=1000 --no-cache-dir
 COPY . .
 
 WORKDIR /fastapi_srv/src
