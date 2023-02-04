@@ -1,7 +1,8 @@
-import pytest
 import json
 from http import HTTPStatus
-import uuid
+
+import pytest
+from utils.request_helper import make_request
 
 
 @pytest.mark.parametrize(
@@ -22,26 +23,26 @@ import uuid
     ]
 )
 @pytest.mark.asyncio
-async def test_get_film_by_id(make_request, query_data: dict, expected_answer: dict):
-    response = await make_request(endpoint=query_data['query'])
+async def test_get_film_by_id(session, query_data: dict, expected_answer: dict):
+    response = await make_request(session, endpoint=query_data['query'])
     assert response['status'] == expected_answer['status']
     assert len(response['body']) == expected_answer['length']
 
 
 @pytest.mark.asyncio
-async def test_get_films(make_request):
-    response = await make_request(endpoint='/films/', params={'sort': 'imdb_rating', 'size': 50, 'page': 1})
+async def test_get_films(session):
+    response = await make_request(session, endpoint='/films/', params={'sort': 'imdb_rating', 'size': 50, 'page': 1})
     assert response['status'] == HTTPStatus.OK
     assert len(response['body']) == 50
 
 
 @pytest.mark.asyncio
-async def test_get_sort_films(make_request):
-    response_desc_sorting = await make_request(endpoint='/films/',
+async def test_get_sort_films(session):
+    response_desc_sorting = await make_request(session, endpoint='/films/',
                                                params={'sort': '-imdb_rating', 'size': 50, 'page': 1})
-    response_asc_sorting = await make_request(endpoint='/films/',
+    response_asc_sorting = await make_request(session, endpoint='/films/',
                                               params={'sort': 'imdb_rating', 'size': 50, 'page': 1})
-    response_wrong_sorting_field = await make_request(endpoint='/films/',
+    response_wrong_sorting_field = await make_request(session, endpoint='/films/',
                                                       params={'sort': 'title', 'size': 50, 'page': 1})
 
     assert response_wrong_sorting_field['status'] == HTTPStatus.UNPROCESSABLE_ENTITY
@@ -64,17 +65,17 @@ async def test_get_sort_films(make_request):
     ]
 )
 @pytest.mark.asyncio
-async def test_film_search(make_request, query_data: dict, expected_answer: dict):
-    response = await make_request(endpoint='/films/search', params=query_data)
+async def test_film_search(session, query_data: dict, expected_answer: dict):
+    response = await make_request(session, endpoint='/films/search', params=query_data)
     assert response['status'] == expected_answer['status']
     assert len(response['body']) == expected_answer['length']
 
 
 @pytest.mark.asyncio
-async def test_cache_film(make_request, es_client, redis_client):
+async def test_cache_film(session, es_client, redis_client):
 
     film_id = '647d1ac4-0f5a-465b-a75c-45941d28198b'
-    response_before_delete = await make_request(endpoint=f'/films/{film_id}')
+    response_before_delete = await make_request(session, endpoint=f'/films/{film_id}')
     assert response_before_delete['status'] == HTTPStatus.OK
 
     await es_client.delete('movies', film_id)
@@ -82,7 +83,7 @@ async def test_cache_film(make_request, es_client, redis_client):
     cache_key = f'movies:api.v1.films:film_details:{film_id}'
     redis_data = await redis_client.get(cache_key)
 
-    response_after_delete = await make_request(f'/films/{film_id}/')
+    response_after_delete = await make_request(session, f'/films/{film_id}/')
     assert json.loads(redis_data) == response_before_delete['body']
     assert response_after_delete['status'] == HTTPStatus.OK
     assert response_before_delete['body'] == response_after_delete['body']
