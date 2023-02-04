@@ -2,6 +2,7 @@ import json
 import uuid
 
 import pytest
+from http import HTTPStatus
 
 
 @pytest.mark.parametrize(
@@ -9,11 +10,11 @@ import pytest
     [
         (
             {'query': '/persons/640d1ac4-0f5a-465b-a75c-45945d28198b'},
-            {'status': 200, 'length': 4}
+            {'status': HTTPStatus.OK, 'length': 4}
         ),
         (
             {'query': '/persons/641d1ac4-0f5a-465b-a75c-45945d28198b'},
-            {'status': 404, 'length': 1}
+            {'status': HTTPStatus.NOT_FOUND, 'length': 1}
         )
     ]
 )
@@ -27,7 +28,7 @@ async def test_persons_detail(make_request, query_data, expected_answer):
 @pytest.mark.asyncio
 async def test_persons_list(make_request):
     response = await make_request(endpoint='/persons/', params={'size': 50, 'page': 1})
-    assert response['status'] == 200
+    assert response['status'] == HTTPStatus.OK
     assert len(response['body']) == 50
 
 
@@ -36,11 +37,11 @@ async def test_persons_list(make_request):
     [
         (
             {'query': '/persons/640d1ac4-0f5a-465b-a75c-45945d28198b/film/'},
-            {'status': 200, 'length': 1}
+            {'status': HTTPStatus.OK, 'length': 1}
         ),
         (
             {'query': '/persons/330d1ac4-0f5a-465b-a75c-45945d28198b/film/'},
-            {'status': 404, 'length': 1}
+            {'status': HTTPStatus.NOT_FOUND, 'length': 1}
         )
     ]
 )
@@ -56,11 +57,11 @@ async def test_persons_films(make_request, query_data, expected_answer):
     [
         (
                 {'query': 'Bob'},
-                {'status': 200, 'length': 50}
+                {'status': HTTPStatus.OK, 'length': 50}
         ),
         (
                 {'query': 'Mashed potato'},
-                {'status': 404, 'length': 1}
+                {'status': HTTPStatus.NOT_FOUND, 'length': 1}
         )
     ]
 )
@@ -79,7 +80,7 @@ async def test_cache_person(make_request, es_client, redis_client):
     await es_client.create('persons', person_id, data)
 
     response_before_delete = await make_request(f'/persons/{person_id}/')
-    assert response_before_delete['status'] == 200
+    assert response_before_delete['status'] == HTTPStatus.OK
 
     await es_client.delete('persons', person_id)
 
@@ -89,5 +90,17 @@ async def test_cache_person(make_request, es_client, redis_client):
     assert json.loads(redis_data) == response_before_delete['body']
 
     response_after_delete = await make_request(f'/persons/{person_id}/')
-    assert response_after_delete['status'] == 200
+    assert response_after_delete['status'] == HTTPStatus.OK
     assert response_before_delete['body'] == response_after_delete['body']
+
+
+@pytest.mark.asyncio
+async def test_bad_request_person(es_client):
+
+    person_id = uuid.uuid4()
+    data = {'id': person_id, 'name': 'Test', 'description': 'wrong field'}
+
+    try:
+        await es_client.create('movies', person_id, data)
+    except:
+        assert HTTPStatus.BAD_REQUEST
