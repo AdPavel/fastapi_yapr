@@ -45,20 +45,3 @@ async def session():
     session = aiohttp.ClientSession()
     yield session
     await session.close()
-
-
-@pytest_asyncio.fixture
-def make_request(session):
-    async def inner(endpoint: str, params: dict = {}) -> dict:
-
-        url = settings.test_service_url + '/api/v1' + endpoint
-
-        async with session.get(url=url, params=params) as response:
-            response = {
-                'body': await response.json(),
-                'headers': response.headers,
-                'status': response.status,
-            }
-            return response
-
-    return inner
