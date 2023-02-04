@@ -15,6 +15,10 @@ from http import HTTPStatus
         (
             {'query': '/persons/641d1ac4-0f5a-465b-a75c-45945d28198b'},
             {'status': HTTPStatus.NOT_FOUND, 'length': 1}
+        ),
+        (
+            {'query': '/persons/wrong_id'},
+            {'status': HTTPStatus.UNPROCESSABLE_ENTITY, 'length': 1}
         )
     ]
 )
@@ -42,6 +46,10 @@ async def test_persons_list(make_request):
         (
             {'query': '/persons/330d1ac4-0f5a-465b-a75c-45945d28198b/film/'},
             {'status': HTTPStatus.NOT_FOUND, 'length': 1}
+        ),
+        (
+            {'query': '/persons/wrong_id/film/'},
+            {'status': HTTPStatus.UNPROCESSABLE_ENTITY, 'length': 1}
         )
     ]
 )
@@ -56,12 +64,12 @@ async def test_persons_films(make_request, query_data, expected_answer):
     'query_data, expected_answer',
     [
         (
-                {'query': 'Bob'},
-                {'status': HTTPStatus.OK, 'length': 50}
+            {'query': 'Bob'},
+            {'status': HTTPStatus.OK, 'length': 50}
         ),
         (
-                {'query': 'Mashed potato'},
-                {'status': HTTPStatus.NOT_FOUND, 'length': 1}
+            {'query': 'Mashed potato'},
+            {'status': HTTPStatus.NOT_FOUND, 'length': 1}
         )
     ]
 )
@@ -92,15 +100,3 @@ async def test_cache_person(make_request, es_client, redis_client):
     response_after_delete = await make_request(f'/persons/{person_id}/')
     assert response_after_delete['status'] == HTTPStatus.OK
     assert response_before_delete['body'] == response_after_delete['body']
-
-
-@pytest.mark.asyncio
-async def test_bad_request_person(es_client):
-
-    person_id = uuid.uuid4()
-    data = {'id': person_id, 'name': 'Test', 'description': 'wrong field'}
-
-    try:
-        await es_client.create('movies', person_id, data)
-    except:
-        assert HTTPStatus.BAD_REQUEST

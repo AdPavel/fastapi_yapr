@@ -13,6 +13,10 @@ from http import HTTPStatus
         (
             {'query': '/genres/640d1ac4-0f5a-465b-a75c-45941d281900'},
             {'status': HTTPStatus.NOT_FOUND, 'length': 1}
+        ),
+        (
+            {'query': '/genres/wrong_id'},
+            {'status': HTTPStatus.UNPROCESSABLE_ENTITY, 'length': 1}
         )
     ]
 )
@@ -28,16 +32,3 @@ async def test_genres_list(make_request):
     response = await make_request(endpoint='/genres/', params={'size': 50, 'page': 1})
     assert response['status'] == HTTPStatus.OK
     assert len(response['body']) == 50
-
-
-@pytest.mark.asyncio
-async def test_bad_request_genre(es_client):
-
-    genre_id = uuid.uuid4()
-    data = {'id': genre_id, 'name': 'Test', 'desc': 'wrong_field'}
-
-    try:
-        await es_client.create('genres', genre_id, data)
-    except:
-        assert HTTPStatus.BAD_REQUEST
-
