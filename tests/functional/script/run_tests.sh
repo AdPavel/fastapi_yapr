@@ -15,4 +15,7 @@ python /functional/utils/wait_for_redis.py
 
 echo "Redis started"
 
+cd /functional
+export PYTHONPATH=.
+
 pytest /functional/src --disable-warnings --color=yes -vv
