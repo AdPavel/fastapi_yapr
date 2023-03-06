@@ -14,6 +14,8 @@ class Base(BaseSettings):
     redis_host: str
     redis_port: int
 
+    auth_service_url: str
+
     class Config:
 
         env_file = f"{pathlib.Path(__file__).resolve().parent.parent.parent.parent}/.env"

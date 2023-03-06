@@ -1,5 +1,7 @@
+from http import HTTPStatus
 from uuid import UUID
 
+from fastapi import HTTPException
 from models.config_models import BaseModel
 
 
@@ -31,3 +33,8 @@ class Film(BaseFilm):
     actors: list[BasePerson] | None = []
     writers: list[BasePerson] | None = []
     directors: list[BasePerson] | None = []
+
+
+class UnauthorizedError(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(status_code=HTTPStatus.UNAUTHORIZED, detail='Bearer Token Error')

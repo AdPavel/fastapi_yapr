@@ -4,9 +4,10 @@ from uuid import UUID
 from api.v1.message import FILMS_MSG
 from api.v1.models.query_models import Sort
 from api.v1.models.response_models import Film, BaseFilm
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Header
 from fastapi_cache.decorator import cache
 from services.film import FilmService, get_service
+from core.utils import get_user_roles
 
 from typing import Optional
 from starlette.requests import Request
@@ -82,9 +83,10 @@ async def get_films_by_genre(
         sort: Sort = Query(default=Sort.imdb_rating_desc, title='Сортировка'),
         page: int = Query(default=1, ge=1, alias='page[number]', title='Страница'),
         size: int = Query(default=50, ge=1, alias='page[size]', title='Количество фильмов на странице'),
+        authorization: str | None = Header(default=None),
         film_service: FilmService = Depends(get_service)
 ) -> list[BaseFilm]:
-
+    # roles = await get_user_roles(authorization)
     films = await film_service.get_films_genre_sort(page=page, size=size, genre_id=genre, sort_=sort.value)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=FILMS_MSG)
