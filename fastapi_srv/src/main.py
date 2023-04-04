@@ -1,5 +1,6 @@
 from logging import config as logging_config
 
+import sentry_sdk
 from elasticsearch import AsyncElasticsearch
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
@@ -12,8 +13,12 @@ from core.logger import LOGGING
 from core.settings import settings
 from db import elastic, redis
 
-
 logging_config.dictConfig(LOGGING)
+
+sentry_sdk.init(
+    dsn=settings.sentry_dsn,
+    traces_sample_rate=1.0,
+)
 
 app = FastAPI(
     title=f"Read-only API для онлайн-кинотеатра: {settings.project_name}",

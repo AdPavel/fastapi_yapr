@@ -16,6 +16,8 @@ class Base(BaseSettings):
 
     auth_service_url: str
 
+    sentry_dsn: str
+
     class Config:
 
         env_file = f"{pathlib.Path(__file__).resolve().parent.parent.parent.parent}/.env"
