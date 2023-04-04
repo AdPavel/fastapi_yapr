@@ -10,10 +10,14 @@ services:
       - ./db/restore/dump.sql:/docker-entrypoint-initdb.d/dump.sql
     expose:
       - "5432"
+    networks:
+      - elk
 
   redis:
     container_name: redis
     image: redis:alpine
+    networks:
+      - elk
 
   els:
     container_name: elasticDB
@@ -31,6 +35,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 50
+    networks:
+      - elk
 
   etl:
     container_name: etl
@@ -40,6 +46,8 @@ services:
     depends_on:
         - db
         - els
+    networks:
+      - elk
 
   kibana:
     container_name: kibana
@@ -50,6 +58,8 @@ services:
       - els
     expose:
       - "5601"
+    networks:
+      - elk
 
   fastapi:
     container_name: fastapi
@@ -61,6 +71,8 @@ services:
       - redis
       - els
       - etl
+    networks:
+      - elk
 
   nginx:
     container_name: dev_web
@@ -69,10 +81,22 @@ services:
     volumes:
       - ./nginx_conf/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx_conf/configs:/etc/nginx/conf.d:ro
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://127.0.0.1:5044
+        tag: movies_api
     ports:
       - "80:80"
     depends_on:
       - fastapi
+    networks:
+      - elk
 
 volumes:
   db:
+
+networks:
+  elk:
+    name: elk
+    driver: bridge
