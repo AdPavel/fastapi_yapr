@@ -16,8 +16,8 @@ services:
   redis:
     container_name: redis
     image: redis:alpine
-    networks:
-      - elk
+
+
 
   els:
     container_name: elasticDB
